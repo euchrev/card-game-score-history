@@ -1,6 +1,6 @@
 # Card Game Score History
 
-**Author:** EuchreV
+**Authors:** Rory Letteney, Austin Jess, Floyd Orr, Michele Saba
 **Version:** 0.1.0
 
 ## Overview
