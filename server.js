@@ -4,12 +4,15 @@ const bcrypt = require("bcryptjs");
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
 const express = require("express");
+const payment = require("./payment");
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 const DATABASE_URL = process.env.DATABASE_URL;
 const SECRET = process.env.SECRET;
 
 app.set("view engine", "ejs");
+
 app.use(
   express.urlencoded({
     extended: true
@@ -19,6 +22,10 @@ app.use(cookieParser());
 const client = new pg.Client(DATABASE_URL);
 client.connect();
 client.on("err", err => console.log(err));
+
+app.use(express.static("public"));
+
+app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => res.render("pages/index"));
 app.get("/dashboard", (req, res) => console.log(req.cookies.auth));
@@ -115,5 +122,11 @@ const loginGroup = (req, res) => {
 
   lookupGroup(handler);
 };
+
+app.post("/payment", (req, res) => payment.processPayment(req, res));
+
+app.post("/payment", (req, res) => payment.processPayment(req, res));
+
+app.post("/payment", (req, res) => payment.processPayment(req, res));
 
 app.listen(PORT, console.log(`App listening on ${PORT}.`));
