@@ -127,4 +127,6 @@ app.post("/payment", (req, res) => payment.processPayment(req, res));
 
 app.post("/payment", (req, res) => payment.processPayment(req, res));
 
+app.post("/payment", (req, res) => payment.processPayment(req, res));
+
 app.listen(PORT, console.log(`App listening on ${PORT}.`));
