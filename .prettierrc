@@ -1,0 +1,6 @@
+{
+  "prettier.bracketSpacing": true,
+  "prettier.singleQuote": true,
+  "editor.formatOnSave": true,
+  "prettier.arrowParens": "always"
+}
