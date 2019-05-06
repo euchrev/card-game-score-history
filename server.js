@@ -12,7 +12,7 @@ const DATABASE_URL = process.env.DATABASE_URL;
 const SECRET = process.env.SECRET;
 
 app.set("view engine", "ejs");
-<<<<<<< Updated upstream
+
 app.use(
   express.urlencoded({
     extended: true
@@ -25,9 +25,8 @@ client.on("err", err => console.log(err));
 
 app.use(express.static("public"));
 
-=======
 app.use(express.urlencoded({ extended: true }));
->>>>>>> Stashed changes
+
 app.get("/", (req, res) => res.render("pages/index"));
 app.get("/dashboard", (req, res) => console.log(req.cookies.auth));
 app.get("/groups", (req, res) => loginGroup(req.query, res));
@@ -123,6 +122,8 @@ const loginGroup = (req, res) => {
 
   lookupGroup(handler);
 };
+
+app.post("/payment", (req, res) => payment.processPayment(req, res));
 
 app.post("/payment", (req, res) => payment.processPayment(req, res));
 
