@@ -23,6 +23,7 @@ client.connect();
 client.on("err", err => console.log(err));
 
 app.get("/", (req, res) => res.render("pages/index"));
+app.get("/dashboard", (req, res) => console.log(req.cookies.auth));
 app.post("/groups", (req, res) => createGroup(req.query, res));
 
 const lookupGroup = handler => {
@@ -37,12 +38,12 @@ const lookupGroup = handler => {
 
 function Group(info) {
   (this.name = info.name),
-    (this.email = info.email),
-    (this.password = info.password),
-    (this.paid = info.paid);
+  (this.email = info.email),
+  (this.password = info.password),
+  (this.paid = info.paid);
 }
 
-Group.prototype.save = function() {
+Group.prototype.save = function () {
   const SQL =
     "INSERT INTO groups (name, email, password, paid) VALUES($1,$2,$3,$4) RETURNING id";
   const values = Object.values(this);
@@ -71,9 +72,14 @@ const createGroup = (req, res) => {
       if (validation.every(result => result === true)) {
         const newGroup = new Group(groupInfo);
         newGroup.save().then(result => {
-          const token = jwt.sign({ id: result.rows[0].id }, SECRET);
+          const token = jwt.sign({
+              id: result.rows[0].id
+            },
+            SECRET
+          );
           res.clearCookie("auth");
           res.cookie("auth", token);
+          res.redirect("/dashboard");
         });
       }
     }
