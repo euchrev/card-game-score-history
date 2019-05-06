@@ -25,6 +25,7 @@ client.on("err", err => console.log(err));
 app.get("/", (req, res) => res.render("pages/index"));
 app.get("/dashboard", (req, res) => console.log(req.cookies.auth));
 app.post("/groups", (req, res) => createGroup(req.query, res));
+// app.post('/groups', (req, res) => console.log(req.query));
 
 const lookupGroup = handler => {
   const SQL = "SELECT * FROM groups WHERE name=$1";
@@ -67,7 +68,8 @@ const createGroup = (req, res) => {
       const groupInfo = {
         name: req.name,
         email: req.email,
-        password: hashedPassword
+        password: hashedPassword,
+        paid: req.paid
       };
       if (validation.every(result => result === true)) {
         const newGroup = new Group(groupInfo);
