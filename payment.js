@@ -12,6 +12,7 @@ app.post("/payment", (req, res) => payment.processPayment(req, res));
 
 module.exports = {
   processPayment: function(req, res) {
+    console.log(req);
     let amount = 1000;
 
     stripe.customers
