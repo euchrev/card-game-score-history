@@ -48,6 +48,8 @@ app.post("/groups", (req, res) => createGroup(req.body, res));
 app.post("/members", (req, res) => addMember(req, res));
 app.post("/payment", (req, res) => stripePayment(req, res, PUBLISHABLE_KEY_TEST));
 
+app.put("/members", (req, res) => updateMember(req, res));
+
 function stripePayment(req, res) {
   (async () => {
     const session = await stripe.checkout.sessions.create({
@@ -80,8 +82,8 @@ const lookupGroup = handler => {
 };
 
 const lookupMember = handler => {
-  const SQL = "SELECT * FROM group_members WHERE name=$1";
-  const values = [`${handler.query.firstname} ${handler.query.lastname}`];
+  const SQL = "SELECT * FROM group_members WHERE name=$1 AND group_id=$2";
+  const values = [`${handler.query.firstname} ${handler.query.lastname}`, handler.query.groupID];
   return client
     .query(SQL, values)
     .then(results =>
@@ -100,19 +102,25 @@ function Group(info) {
 
 function Member(info) {
   (this.name = info.name),
-  (this.group = info.group_id);
+  (this.groupID = info.groupID);
 }
 
 Group.prototype.save = function () {
   const SQL =
     "INSERT INTO groups (name, email, password, paid) VALUES($1,$2,$3,$4) RETURNING id";
-  const values = Object.values(this);
+  const values = [this.name, this.email, this.password, this.paid];
   return client.query(SQL, values);
 };
 
 Member.prototype.save = function () {
   const SQL = "INSERT INTO group_members (name, group_id) VALUES($1,$2)";
-  const values = Object.values(this);
+  const values = [this.name, this.groupID];
+  return client.query(SQL, values);
+}
+
+Member.update = function (info) {
+  const SQL = "UPDATE group_members SET name=$1 WHERE name=$2 AND group_id=$3";
+  const values = [info.newName, info.currentName, info.groupID];
   return client.query(SQL, values);
 }
 
@@ -185,19 +193,53 @@ const loginGroup = (req, res) => {
 };
 
 const addMember = (req, res) => {
-  const group_id = jwt.verify(req.cookies.auth, SECRET, (err, decoded) => decoded.id);
+  const groupID = jwt.verify(req.cookies.auth, SECRET, (err, decoded) => decoded.id);
+  const firstname = req.body.firstname;
+  const lastname = req.body.lastname;
   const handler = {
-    query: req,
+    query: {
+      firstname,
+      lastname,
+      groupID
+    },
     cacheHit: result => {
       console.log('Member exists');
     },
     cacheMiss: result => {
       const newMember = new Member({
         name: `${req.body.firstname} ${req.body.lastname}`,
-        group_id
+        groupID
       });
       newMember.save()
         .then(result => res.redirect("/members"));
+    }
+  }
+
+  lookupMember(handler);
+}
+
+const updateMember = (req, res) => {
+  const groupID = jwt.verify(req.cookies.auth, SECRET, (err, decoded) => decoded.id);
+  const firstname = req.body.firstname;
+  const lastname = req.body.lastname;
+  const currentName = req.body.currentname;
+  const handler = {
+    query: {
+      firstname,
+      lastname,
+      groupID
+    },
+    cacheHit: result => {
+      const memberInfo = {
+        newName: `${firstname} ${lastname}`,
+        currentName,
+        groupID
+      }
+      Member.update(memberInfo)
+        .then(result => res.redirect('/members'));
+    },
+    cacheMiss: result => {
+      console.log('Member does not exist');
     }
   }
 
