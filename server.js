@@ -25,11 +25,20 @@ client.on("err", err => console.log(err));
 
 app.use(express.static("public"));
 
-app.use(express.urlencoded({ extended: true }));
+app.use(
+  express.urlencoded({
+    extended: true
+  })
+);
 
 app.get("/", (req, res) => res.render("pages/index"));
+app.get("/login", (req, res) => res.render("pages/login"));
 app.get("/dashboard", (req, res) => console.log(req.cookies.auth));
 app.get("/groups", (req, res) => loginGroup(req.query, res));
+app.get(
+  "/logout",
+  (req, res) => res.clearCookie("auth") && res.redirect("/login")
+);
 app.post("/groups", (req, res) => createGroup(req.query, res));
 
 const lookupGroup = handler => {
@@ -107,7 +116,12 @@ const loginGroup = (req, res) => {
         result.rows[0].password
       );
       if (passwordIsValid) {
-        const token = jwt.sign({ id: result.rows[0].id }, SECRET);
+        const token = jwt.sign(
+          {
+            id: result.rows[0].id
+          },
+          SECRET
+        );
         res.clearCookie("auth");
         res.cookie("auth", token);
         res.redirect("/dashboard");
