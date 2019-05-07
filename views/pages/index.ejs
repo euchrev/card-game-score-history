@@ -10,15 +10,18 @@
     <link rel="shortcut icon" href="./img/trophy.png" type="image/x-icon" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <link rel="stylesheet" type="text/css" href="./css/base.css" />
+    <link rel="stylesheet" type="text/css" href="./css/layout.css" />
     <title>Document</title>
   </head>
   <body>
     <section class="flex-container">
-      <form class="flex-container" action="/groups" method="post">
+      <form class="flex-container" action="/groups" method="get">
         <input name="email" placeholder="email" />
         <input name="password" placeholder="password" />
-        <button type="" class="button-lg-blue">Sign In</button>
-        <a href="/payment" class="button-lg-white">Sign up</a>
+        <button type="submit" class="button-lg blue">
+          Sign In
+        </button>
+        <a href="/signup" class="button-lg blue-border text-center">Sign Up</a>
       </form>
     </section>
   </body>
