@@ -10,6 +10,10 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const DATABASE_URL = process.env.DATABASE_URL;
 const SECRET = process.env.SECRET;
+const GoogleSpreadsheet = require("google-spreadsheet");
+const { promisify } = require("util");
+const creds = require("./client_secret.json");
+const async = require("async");
 const SECRET_KEY_TEST = process.env.SECRET_KEY_TEST;
 const PUBLISHABLE_KEY_TEST = process.env.PUBLISHABLE_KEY_TEST;
 const stripe = require('stripe')(SECRET_KEY_TEST);
@@ -26,7 +30,52 @@ app.use(cookieParser());
 app.use(methodOverride('_method'));
 const client = new pg.Client(DATABASE_URL);
 client.connect();
-client.on('err', err => console.log(err));
+client.on("err", err => console.log(err));
+const doc = new GoogleSpreadsheet(
+  "10PIDgiRsDs7JxNNYZBknTV8y78gCBt20-DPifqLCgJc"
+);
+
+async.series(
+  [
+    function setAuth(step) {
+      console.log("set auth");
+
+      doc.useServiceAccountAuth(creds, step);
+    },
+
+    function getInfoAndWorksheets(step) {
+      console.log("get data");
+      doc.getInfo(function(err, info) {
+        console.log("Loaded doc: " + info.title + " by " + info.author.email);
+        sheet = info.worksheets[0];
+        console.log(
+          "sheet 1: " +
+            sheet.title +
+            " " +
+            sheet.rowCount +
+            "x" +
+            sheet.colCount
+        );
+        sheet.getRows(
+          {
+            offset: 1,
+            limit: 20,
+            orderby: "col2"
+          },
+          function(err, rows) {
+            console.log(rows);
+          }
+        );
+        step();
+      });
+    }
+  ],
+  function(err) {
+    if (err) {
+      console.log("ERROR:" + err);
+    }
+  }
+);
 
 app.use(express.static('public'));
 
