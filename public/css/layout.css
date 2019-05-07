@@ -14,7 +14,13 @@ input {
   text-align: left;
   padding: 5px;
 }
-.flex-container {
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+}
+.flex-container-form {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -25,3 +31,4 @@ input {
 .text-center {
   text-align: center;
 }
+

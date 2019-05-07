@@ -5,7 +5,6 @@ const cookieParser = require("cookie-parser");
 require("dotenv").config();
 const express = require("express");
 
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 const DATABASE_URL = process.env.DATABASE_URL;
@@ -44,7 +43,9 @@ app.get(
 );
 app.post("/groups", (req, res) => createGroup(req.query, res));
 
-app.post("/payment", (req, res) => stripePayment(req, res, PUBLISHABLE_KEY_TEST));
+app.post("/payment", (req, res) =>
+  stripePayment(req, res, PUBLISHABLE_KEY_TEST)
+);
 
 function stripePayment(req, res) {
   (async () => {
@@ -162,5 +163,9 @@ const loginGroup = (req, res) => {
 
   lookupGroup(handler);
 };
+
+app.get("/about", function(req, res) {
+  res.render("pages/about");
+});
 
 app.listen(PORT, console.log(`App listening on ${PORT}.`));

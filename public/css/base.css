@@ -3,22 +3,34 @@ p,
 h1,
 h2,
 h3,
-nav {
+nav,
+header {
   margin: 0;
   padding: 0;
 }
-
 body {
   background-color: #dfe3e8;
-  width: 100%;
   font-family: "Montserrat", sans-serif;
   margin: 0;
   padding: 0;
 }
+header {
+  background-color: #212b36;
+  padding-top: 50px;
+  height: 180px;
+  color: #fff;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+.img-fluid {
+  max-width: 100%;
+  height: auto;
+}
 nav {
   margin: 0;
   background-color: #1c2260;
-  width: 100%;
+  max-width: 100%;
   color: #fff;
   height: auto;
   padding-left: 20px;
@@ -47,7 +59,17 @@ a {
   background-color: #fff !important;
   border: 2px solid #1c2260;
 }
+.bio {
+  width: 250px;
+  margin: 15px;
+  text-align: center;
+}
 @media only screen and (max-width: 767px) {
+  .bio {
+    width: 400px;
+    margin: 15px;
+    text-align: center;
+  }
   h1 {
     font-size: 27px;
     line-height: 36px;
@@ -75,14 +97,13 @@ a {
   }
   .subheading {
     font-size: 13px;
-    line-height: 16px;
+    line-height: 25px;
     font-weight: 700;
     text-transform: uppercase;
   }
   p {
     font-size: 15px;
     line-height: 20px;
-    font-weight: 400;
   }
   .caption {
     font-size: 13px;
