@@ -32,6 +32,7 @@ app.use(
 );
 
 app.get("/", (req, res) => res.render("pages/index"));
+app.get("/login", (req, res) => res.render("pages/login"));
 app.get("/dashboard", (req, res) => console.log(req.cookies.auth));
 app.get("/groups", (req, res) => loginGroup(req.query, res));
 app.get(
