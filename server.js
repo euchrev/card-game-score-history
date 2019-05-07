@@ -5,7 +5,6 @@ const cookieParser = require("cookie-parser");
 require("dotenv").config();
 const express = require("express");
 
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 const DATABASE_URL = process.env.DATABASE_URL;
@@ -21,6 +20,7 @@ app.use(
     extended: true
   })
 );
+
 app.use(cookieParser());
 const client = new pg.Client(DATABASE_URL);
 client.connect();
@@ -44,7 +44,7 @@ app.get(
 );
 app.post("/groups", (req, res) => createGroup(req.query, res));
 
-app.post("/payment", (req, res) => stripePayment(req, res, PUBLISHABLE_KEY_TEST));
+app.get("/payment", (req, res) => stripePayment(req, res));
 
 function stripePayment(req, res) {
   (async () => {
@@ -54,16 +54,16 @@ function stripePayment(req, res) {
         {
           name: "EuchreV Subscription",
           description: "Lifetime subscription of EuchreV",
-          images: ["https://example.com/t-shirt.png"],
+          images: ["https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Euchre.jpg/220px-Euchre.jpg"],
           amount: 1000,
           currency: "usd",
           quantity: 1
         }
       ],
-      success_url: "https://localhost:3000/payment",
-      cancel_url: "https://localhost:3000/payment"
+      success_url: "https://localhost:3000/dashboard",
+      cancel_url: "https://localhost:3000/"
     });
-    console.log(session);
+    res.render('pages/payment.ejs', {sessionId: session.id})
   })();
 }
 
