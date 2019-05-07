@@ -39,13 +39,13 @@ app.use(
 app.get("/", (req, res) => res.render("pages/index"));
 app.get("/login", (req, res) => res.render("pages/login"));
 app.get("/dashboard", (req, res) => console.log(req.cookies.auth));
-app.get("/groups", (req, res) => loginGroup(req.query, res));
+app.get("/groups", (req, res) => loginGroup(req.body, res));
 app.get(
   "/logout",
   (req, res) => res.clearCookie("auth") && res.redirect("/login")
 );
-app.post("/groups", (req, res) => createGroup(req.query, res));
-
+app.post("/groups", (req, res) => createGroup(req.body, res));
+app.post("/members", (req, res) => addMember(req.body, res));
 app.post("/payment", (req, res) => stripePayment(req, res, PUBLISHABLE_KEY_TEST));
 
 function stripePayment(req, res) {
@@ -70,6 +70,18 @@ function stripePayment(req, res) {
 const lookupGroup = handler => {
   const SQL = "SELECT * FROM groups WHERE name=$1";
   const values = [handler.query.name];
+  return client
+    .query(SQL, values)
+    .then(results =>
+      !results.rows.length ?
+      handler.cacheMiss(results) :
+      handler.cacheHit(results)
+    );
+};
+
+const lookupMember = handler => {
+  const SQL = "SELECT * FROM group_members WHERE name=$1";
+  const values = [`${handler.query.firstname} ${handler.query.lastname}`];
   return client
     .query(SQL, values)
     .then(results =>
@@ -160,5 +172,19 @@ const loginGroup = (req, res) => {
 
   lookupGroup(handler);
 };
+
+const addMember = (req, res) => {
+  const handler = {
+    query: req,
+    cacheHit: result => {
+      console.log('Member exists');
+    },
+    cacheMiss: result => {
+      console.log('Member doesn\'t exist');
+    }
+  }
+
+  lookupMember(handler);
+}
 
 app.listen(PORT, console.log(`App listening on ${PORT}.`));
