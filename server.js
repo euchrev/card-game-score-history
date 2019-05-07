@@ -42,11 +42,33 @@ app.get(
   "/logout",
   (req, res) => res.clearCookie("auth") && res.redirect("/login")
 );
+app.get('/members', (req, res) => memberLeaderboard(req, res));
+// STRIPE CHECKOUT ROUTES
 app.post("/groups", (req, res) => createGroup(req.query, res));
+app.get("/payment", (req, res) => stripePayment(res));
 
-app.get("/payment", (req, res) => stripePayment(req, res));
+// GET INDIVIDUAL MEMBERS FROM DB FOR MEMBER LEADERBOARD
+const getMembersFromDB = (req, res) => {
+  const memberSQL = `SELECT * FROM group_members;`;
 
-function stripePayment(req, res) {
+  client.query(SQL)
+    .then(results => {
+      memberLeaderboard(req, res, members);
+    })
+}
+
+const memberLeaderboard = (req, res) => {
+  const SQL = `SELECT winning_team, losing_team FROM games INNER JOIN group_members ON games.winning_team = group_members.id;`;
+
+  client.query(SQL)
+    .then(results => {
+      console.log('Got members from DB', results);
+      res.render('MEMEBERS EJS', {members: results.rows});
+    })
+}
+
+// STRIPE PAYMENT FUNCTIONALITY
+function stripePayment(res) {
   (async () => {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
