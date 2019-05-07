@@ -11,6 +11,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const DATABASE_URL = process.env.DATABASE_URL;
 const SECRET = process.env.SECRET;
+const SECRET_KEY_TEST = process.env.SECRET_KEY_TEST;
+const PUBLISHABLE_KEY_TEST = process.env.PUBLISHABLE_KEY_TEST;
+const stripe = require("stripe")(SECRET_KEY_TEST);
 
 app.set("view engine", "ejs");
 
@@ -43,26 +46,47 @@ app.get(
 );
 app.post("/groups", (req, res) => createGroup(req.query, res));
 
+app.post("/payment", (req, res) => stripePayment(req, res, PUBLISHABLE_KEY_TEST));
+
+function stripePayment(req, res) {
+  (async () => {
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [{
+        name: "EuchreV Subscription",
+        description: "Lifetime subscription of EuchreV",
+        images: ["https://example.com/t-shirt.png"],
+        amount: 1000,
+        currency: "usd",
+        quantity: 1
+      }],
+      success_url: "https://localhost:3000/payment",
+      cancel_url: "https://localhost:3000/payment"
+    });
+    console.log(session);
+  })();
+}
+
 const lookupGroup = handler => {
   const SQL = "SELECT * FROM groups WHERE name=$1";
   const values = [handler.query.name];
   return client
     .query(SQL, values)
     .then(results =>
-      !results.rows.length
-        ? handler.cacheMiss(results)
-        : handler.cacheHit(results)
+      !results.rows.length ?
+      handler.cacheMiss(results) :
+      handler.cacheHit(results)
     );
 };
 
 function Group(info) {
   (this.name = info.name),
-    (this.email = info.email),
-    (this.password = info.password),
-    (this.paid = info.paid);
+  (this.email = info.email),
+  (this.password = info.password),
+  (this.paid = info.paid);
 }
 
-Group.prototype.save = function() {
+Group.prototype.save = function () {
   const SQL =
     "INSERT INTO groups (name, email, password, paid) VALUES($1,$2,$3,$4) RETURNING id";
   const values = Object.values(this);
@@ -92,8 +116,7 @@ const createGroup = (req, res) => {
       if (validation.every(result => result === true)) {
         const newGroup = new Group(groupInfo);
         newGroup.save().then(result => {
-          const token = jwt.sign(
-            {
+          const token = jwt.sign({
               id: result.rows[0].id
             },
             SECRET
@@ -118,8 +141,7 @@ const loginGroup = (req, res) => {
         result.rows[0].password
       );
       if (passwordIsValid) {
-        const token = jwt.sign(
-          {
+        const token = jwt.sign({
             id: result.rows[0].id
           },
           SECRET
@@ -138,11 +160,5 @@ const loginGroup = (req, res) => {
 
   lookupGroup(handler);
 };
-
-app.post("/payment", (req, res) => payment.processPayment(req, res));
-
-app.post("/payment", (req, res) => payment.processPayment(req, res));
-
-app.post("/payment", (req, res) => payment.processPayment(req, res));
 
 app.listen(PORT, console.log(`App listening on ${PORT}.`));
