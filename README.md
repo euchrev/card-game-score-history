@@ -1,13 +1,14 @@
 # Card Game Score History
 
 **Authors:** Rory Letteney, Austin Jess, Floyd Orr, Michele Saba
-**Version:** 0.6.3
+**Version:** 0.7.4
 
 ## Overview
 
 ## Architecture
 
 ## Change log
+- 05-07-2019 *1:17* - Stripe Checkout functionality is working. Removed payment.js and moved functions into server.js file.
 - 05-07-2019 *11:06* - Refactored some of the Stripe API code to work for one-time purchases. NOT FUNCTIONAL
 - 05-07-2019 *9:54am* - Users now have the ability to logout of their group.
 - 05-06-2019 *6:33pm* - Created payment endpoint to access Stripe API (payment not accepting card - further testing needed)
