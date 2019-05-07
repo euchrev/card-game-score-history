@@ -5,7 +5,8 @@ CREATE TABLE groups (
 id SERIAL PRIMARY KEY,
 name VARCHAR(255),
 email VARCHAR(255),
-password VARCHAR(255)
+password VARCHAR(255),
+paid BOOL NOT NULL
 );
 
 CREATE TABLE group_members (
