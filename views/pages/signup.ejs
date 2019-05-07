@@ -3,7 +3,17 @@
 <%- include ../partials/head.ejs %>
 
 <body>
-  
+  <%- include ../partials/main-nav.ejs %>
+  <main class="flex-container">
+    <form id="signup" class="flex-container" action="/groups" method="POST">
+      <h2 class="signup__title">New Group</h2>
+      <input name="name" type="text" placeholder="The Fighting Irish" required>
+      <input name="email" type="email" placeholder="Group Email" required>
+      <input name="password" type="password" placeholder="Password" required>
+      <input type="submit" class="button-lg blue" value="Create Group">
+      <a href="/" class="button-lg blue-border text-center">Login</a>
+    </form>
+  </main>
 </body>
 
 </html>

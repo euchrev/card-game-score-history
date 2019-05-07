@@ -11,11 +11,9 @@ const PORT = process.env.PORT || 3000;
 const DATABASE_URL = process.env.DATABASE_URL;
 const SECRET = process.env.SECRET;
 const GoogleSpreadsheet = require("google-spreadsheet");
-const { promisify } = require("util");
 const creds = require("./client_secret.json");
 const async = require("async");
 const SECRET_KEY_TEST = process.env.SECRET_KEY_TEST;
-const PUBLISHABLE_KEY_TEST = process.env.PUBLISHABLE_KEY_TEST;
 const stripe = require('stripe')(SECRET_KEY_TEST);
 
 app.set('view engine', 'ejs');
@@ -38,39 +36,38 @@ const doc = new GoogleSpreadsheet(
 async.series(
   [
     function setAuth(step) {
-      console.log("set auth");
+      // console.log("set auth");
 
       doc.useServiceAccountAuth(creds, step);
     },
 
     function getInfoAndWorksheets(step) {
-      console.log("get data");
-      doc.getInfo(function(err, info) {
-        console.log("Loaded doc: " + info.title + " by " + info.author.email);
+      // console.log("get data");
+      doc.getInfo(function (err, info) {
+        // console.log("Loaded doc: " + info.title + " by " + info.author.email);
         sheet = info.worksheets[0];
-        console.log(
-          "sheet 1: " +
-            sheet.title +
-            " " +
-            sheet.rowCount +
-            "x" +
-            sheet.colCount
-        );
-        sheet.getRows(
-          {
+        // console.log(
+        //   "sheet 1: " +
+        //   sheet.title +
+        //   " " +
+        //   sheet.rowCount +
+        //   "x" +
+        //   sheet.colCount
+        // );
+        sheet.getRows({
             offset: 1,
             limit: 20,
             orderby: "col2"
           },
-          function(err, rows) {
-            console.log(rows);
+          function (err, rows) {
+            // console.log(rows);
           }
         );
         step();
       });
     }
   ],
-  function(err) {
+  function (err) {
     if (err) {
       console.log("ERROR:" + err);
     }
@@ -87,6 +84,7 @@ app.use(
 
 app.get('/', (req, res) => res.render('pages/index'));
 app.get('/login', (req, res) => res.render('pages/login'));
+app.get('/signup', (req, res) => res.render('pages/signup'));
 app.get('/dashboard', (req, res) => console.log(req.cookies.auth));
 app.get('/groups', (req, res) => loginGroup(req.body, res));
 app.get('/payment', (req, res) => stripePayment(req, res));
@@ -151,7 +149,7 @@ function Group(info) {
   (this.name = info.name),
   (this.email = info.email),
   (this.password = info.password),
-  (this.paid = info.paid);
+  (this.paid = false);
 }
 
 function Member(info) {
@@ -214,7 +212,7 @@ const createGroup = (req, res) => {
           );
           res.clearCookie('auth');
           res.cookie('auth', token);
-          res.redirect('/dashboard');
+          res.redirect('/payment');
         });
       }
     }
