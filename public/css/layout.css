@@ -19,6 +19,7 @@ input {
   flex-wrap: wrap;
   justify-content: center;
   align-content: center;
+  padding: 20px;
 }
 .flex-container-form {
   display: flex;

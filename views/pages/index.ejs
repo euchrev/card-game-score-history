@@ -11,18 +11,20 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <link rel="stylesheet" type="text/css" href="./css/base.css" />
     <link rel="stylesheet" type="text/css" href="./css/layout.css" />
-    <title>Document</title>
+    <title>Home</title>
   </head>
   <body>
-    <%- include ../partials/nav.ejs %>
+    <header>
+      <%- include ../partials/nav.ejs %>
+    </header>
     <section class="container">
       <form class="flex-container-form" action="/groups" method="get">
         <input name="email" placeholder="email" />
         <input name="password" placeholder="password" />
-        <button type="submit" class="button-lg blue">
+        <button type="submit" class="button-lg dark">
           Sign In
         </button>
-        <a href="/signup" class="button-lg blue-border text-center">Sign Up</a>
+        <a href="/signup" class="button-lg dark-border text-center">Sign Up</a>
       </form>
     </section>
   </body>
