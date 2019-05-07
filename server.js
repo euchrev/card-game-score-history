@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 require("dotenv").config();
 const express = require("express");
 const payment = require("./payment");
+const methodOverride = require('method-override');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -19,6 +20,7 @@ app.use(
   })
 );
 app.use(cookieParser());
+app.use(methodOverride('_method'));
 const client = new pg.Client(DATABASE_URL);
 client.connect();
 client.on("err", err => console.log(err));
