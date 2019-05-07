@@ -36,7 +36,7 @@ app.get("/dashboard", (req, res) => console.log(req.cookies.auth));
 app.get("/groups", (req, res) => loginGroup(req.query, res));
 app.get(
   "/logout",
-  (req, res) => res.clearCookie("auth") && res.render("pages/login")
+  (req, res) => res.clearCookie("auth") && res.redirect("/login")
 );
 app.post("/groups", (req, res) => createGroup(req.query, res));
 
