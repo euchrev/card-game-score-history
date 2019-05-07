@@ -1,7 +1,7 @@
 # Card Game Score History
 
 **Authors:** Rory Letteney, Austin Jess, Floyd Orr, Michele Saba
-**Version:** 0.4.1
+**Version:** 0.4.4
 
 ## Overview
 
