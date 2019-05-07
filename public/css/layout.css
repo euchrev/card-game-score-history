@@ -1,0 +1,27 @@
+form {
+  max-width: 400px;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: center;
+  background-color: #fff;
+}
+input {
+  line-height: 35px;
+  outline-style: none;
+  width: 100%;
+  margin: 5px;
+  text-align: left;
+  padding: 5px;
+}
+.flex-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+  padding: 6%;
+  margin: 0;
+}
+.text-center {
+  text-align: center;
+}
