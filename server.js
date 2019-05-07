@@ -45,7 +45,7 @@ app.get(
   (req, res) => res.clearCookie("auth") && res.redirect("/login")
 );
 app.post("/groups", (req, res) => createGroup(req.body, res));
-app.post("/members", (req, res) => addMember(req.body, res));
+app.post("/members", (req, res) => addMember(req, res));
 app.post("/payment", (req, res) => stripePayment(req, res, PUBLISHABLE_KEY_TEST));
 
 function stripePayment(req, res) {
@@ -98,12 +98,23 @@ function Group(info) {
   (this.paid = info.paid);
 }
 
+function Member(info) {
+  (this.name = info.name),
+  (this.group = info.group_id);
+}
+
 Group.prototype.save = function () {
   const SQL =
     "INSERT INTO groups (name, email, password, paid) VALUES($1,$2,$3,$4) RETURNING id";
   const values = Object.values(this);
   return client.query(SQL, values);
 };
+
+Member.prototype.save = function () {
+  const SQL = "INSERT INTO group_members (name, group_id) VALUES($1,$2)";
+  const values = Object.values(this);
+  return client.query(SQL, values);
+}
 
 const createGroup = (req, res) => {
   const validation = [
@@ -174,13 +185,19 @@ const loginGroup = (req, res) => {
 };
 
 const addMember = (req, res) => {
+  const group_id = jwt.verify(req.cookies.auth, SECRET, (err, decoded) => decoded.id);
   const handler = {
     query: req,
     cacheHit: result => {
       console.log('Member exists');
     },
     cacheMiss: result => {
-      console.log('Member doesn\'t exist');
+      const newMember = new Member({
+        name: `${req.body.firstname} ${req.body.lastname}`,
+        group_id
+      });
+      newMember.save()
+        .then(result => res.redirect("/members"));
     }
   }
 
