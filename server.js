@@ -22,6 +22,7 @@ app.use(
     extended: true
   })
 );
+
 app.use(cookieParser());
 app.use(methodOverride('_method'));
 const client = new pg.Client(DATABASE_URL);
@@ -46,7 +47,7 @@ app.get(
 );
 app.post("/groups", (req, res) => createGroup(req.body, res));
 app.post("/members", (req, res) => addMember(req, res));
-app.post("/payment", (req, res) => stripePayment(req, res, PUBLISHABLE_KEY_TEST));
+app.get("/payment", (req, res) => stripePayment(req, res));
 
 app.put("/members", (req, res) => updateMember(req, res));
 
@@ -54,18 +55,20 @@ function stripePayment(req, res) {
   (async () => {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
-      line_items: [{
-        name: "EuchreV Subscription",
-        description: "Lifetime subscription of EuchreV",
-        images: ["https://example.com/t-shirt.png"],
-        amount: 1000,
-        currency: "usd",
-        quantity: 1
-      }],
-      success_url: "https://localhost:3000/payment",
-      cancel_url: "https://localhost:3000/payment"
+      line_items: [
+        {
+          name: "EuchreV Subscription",
+          description: "Lifetime subscription of EuchreV",
+          images: ["https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Euchre.jpg/220px-Euchre.jpg"],
+          amount: 1000,
+          currency: "usd",
+          quantity: 1
+        }
+      ],
+      success_url: "https://localhost:3000/dashboard",
+      cancel_url: "https://localhost:3000/"
     });
-    console.log(session);
+    res.render('pages/payment.ejs', {sessionId: session.id})
   })();
 }
 
