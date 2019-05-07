@@ -1,14 +1,14 @@
 # Card Game Score History
 
 **Authors:** Rory Letteney, Austin Jess, Floyd Orr, Michele Saba
-**Version:** 0.7.4
+**Version:** 0.10.9
 
 ## Overview
 
 ## Architecture
 
 ## Change log
-
+- 05-07-2019 *2:15pm* - Server now has functionality for adding, updating, and deleting members. Also has starter code for member manipulation forms.
 - 05-07-2019 *1:17pm* - Stripe Checkout functionality is working. Removed payment.js and moved functions into server.js file.
 - 05-07-2019 *11:06am* - Refactored some of the Stripe API code to work for one-time purchases. NOT FUNCTIONAL
 - 05-07-2019 *9:54am* - Users now have the ability to logout of their group.
