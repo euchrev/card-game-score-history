@@ -5,51 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Stripe Checkout Integration</title>
-    <script src="https://checkout.stripe.com/checkout.js"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+      const stripe = Stripe(publishableKey);
+
+      stripe.redirectToCheckout({
+        sessionId: '{{CHECKOUT_SESSION_ID}}',
+
+      }).then(result => {
+        console.log(result);
+      })
+
+      const checkout = document.getElementById('stripe-checkout');
+      checkout.addEventListener('click', (e) => {
+        stripe.redirectToCheckout();
+      })
+    </script>
   </head>
   <body>
     <h2>Stripe Checkout</h2>
-    <div id="shop">
-      <button id="buttonCheckout">Checkout</button>
-    </div>
-
-    <script>
-      // configure checkout stripe checkout library
-      const checkoutHandler = StripeCheckout.configure({
-        // Should we pass this in from payment.js??????
-        key: "pk_test_muKyN9msiWcPaexO3PP1Rss400UtbItLmh",
-        locale: "auto"
-      });
-
-      const checkoutButton = document.getElementById("checkout-button");
-      checkoutButton.addEventListener("click", ev => {
-        checkoutHandler.open({
-          name: "EuchreV Store",
-          description: "Lifetime score keeping app purchase",
-          token: handleToken
-        });
-      });
-
-      function handleToken(token) {
-        fetch("/payment", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(token)
-        })
-          // checkout button will be replaced by the newly created p tag once submitted
-          .then(response => {
-            if (!response.ok) {
-              throw response;
-            }
-            return response.json();
-          })
-          .then(output => {
-            console.log("Purchase succeeded:", output);
-          })
-          .catch(err => {
-            console.log("Purchase failed:", err);
-          });
-      }
-    </script>
+    <button id="stripe-checkout">CHECKOUT</button>
   </body>
 </html>

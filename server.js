@@ -4,12 +4,15 @@ const bcrypt = require("bcryptjs");
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
 const express = require("express");
-const payment = require("./payment");
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const DATABASE_URL = process.env.DATABASE_URL;
 const SECRET = process.env.SECRET;
+const SECRET_KEY_TEST = process.env.SECRET_KEY_TEST;
+const PUBLISHABLE_KEY_TEST = process.env.PUBLISHABLE_KEY_TEST;
+const stripe = require("stripe")(SECRET_KEY_TEST);
 
 app.set("view engine", "ejs");
 
@@ -40,6 +43,29 @@ app.get(
   (req, res) => res.clearCookie("auth") && res.redirect("/login")
 );
 app.post("/groups", (req, res) => createGroup(req.query, res));
+
+app.post("/payment", (req, res) => stripePayment(req, res, PUBLISHABLE_KEY_TEST));
+
+function stripePayment(req, res) {
+  (async () => {
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          name: "EuchreV Subscription",
+          description: "Lifetime subscription of EuchreV",
+          images: ["https://example.com/t-shirt.png"],
+          amount: 1000,
+          currency: "usd",
+          quantity: 1
+        }
+      ],
+      success_url: "https://localhost:3000/payment",
+      cancel_url: "https://localhost:3000/payment"
+    });
+    console.log(session);
+  })();
+}
 
 const lookupGroup = handler => {
   const SQL = "SELECT * FROM groups WHERE name=$1";
@@ -136,11 +162,5 @@ const loginGroup = (req, res) => {
 
   lookupGroup(handler);
 };
-
-app.post("/payment", (req, res) => payment.processPayment(req, res));
-
-app.post("/payment", (req, res) => payment.processPayment(req, res));
-
-app.post("/payment", (req, res) => payment.processPayment(req, res));
 
 app.listen(PORT, console.log(`App listening on ${PORT}.`));

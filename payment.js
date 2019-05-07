@@ -1,38 +1,30 @@
-const keyPublishable = process.env.PUBLISHABLE_KEY_TEST;
+
 const keySecret = process.env.SECRET_KEY_TEST;
+const keyPublic = process.env.PUBLISHABLE_KEY;
 
 const express = require("express");
+require("dotenv").config();
 const stripe = require("stripe")(keySecret);
-// BODY PARSER?????
 
 const app = express();
 
-app.post("/payment", (req, res) => payment.processPayment(req, res));
 
+// function stripePayment() {
+//   (async () => {
+//     const session = await stripe.checkout.sessions.create({
+//       payment_method_types: ['card'],
+//       line_items: [{
+//         name: 'EuchreV Subscription',
+//         description: 'Lifetime subscription of EuchreV',
+//         images: ['https://example.com/t-shirt.png'],
+//         amount: 1000,
+//         currency: 'usd',
+//         quantity: 1,
+//       }],
+//       success_url: 'https://localhost:3000/payment',
+//       cancel_url: 'https://localhost:3000/payment'
+//     })
+//     console.log(session);
+//   })();
+// }
 
-module.exports = {
-  processPayment: function(req, res) {
-    console.log(req);
-    let amount = 1000;
-
-    stripe.customers
-      .create({
-        email: req.body.email,
-        card: req.body.id
-      })
-      .then(customer => {
-        stripe.charges
-          .create({
-            amount,
-            description: `Lifetime subscription for EuchreV`,
-            currency: "usd",
-            customer: customer.id
-          })
-          .then(charge => res.send(charge))
-          .catch(err => {
-            console.log("Error:", err);
-            res.status(500).send({ error: "Purchase Failed" });
-          });
-      });
-  }
-};
