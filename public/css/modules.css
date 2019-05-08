@@ -1,0 +1,10 @@
+.dashboard-header {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.dashboard-header ul {
+  display: flex;
+  justify-content: space-around;
+  list-style-type: none;
+}
