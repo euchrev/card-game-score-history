@@ -7,7 +7,10 @@ nav {
   margin: 0;
   padding: 0;
 }
-
+.img-fluid {
+  max-width: 100%;
+  height: auto;
+}
 body {
   background-color: #dfe3e8;
   width: 100%;
@@ -46,6 +49,16 @@ a {
 .blue-border {
   background-color: #fff !important;
   border: 2px solid #1c2260;
+}
+.bio {
+  width: 200px;
+  margin: 10px;
+}
+.subheading {
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 @media only screen and (max-width: 767px) {
   h1 {
@@ -88,5 +101,9 @@ a {
     font-size: 13px;
     line-height: 20px;
     font-weight: 400;
+  }
+  .bio {
+    width: 300px;
+    margin: 10px;
   }
 }
