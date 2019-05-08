@@ -1,13 +1,14 @@
 # Card Game Score History
 
 **Authors:** Rory Letteney, Austin Jess, Floyd Orr, Michele Saba
-**Version:** 0.14.3
+**Version:** 0.17.3
 
 ## Overview
 
 ## Architecture
 
 ## Change log
+- 05-08-2019 *4:24pm* - Dashboard now receiving all of the data it needs to render the leaderboards.
 - 05-08-2019 *9:26am* - Signup form is created and hookedup. Paid status is updated upon payment completion.
 - 05-07-2019 *1:54pm* - Google sheet is reading from DB
 - 05-07-2019 *2:15pm* - Server now has functionality for adding, updating, and deleting members. Also has starter code for member manipulation forms.
