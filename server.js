@@ -9,7 +9,7 @@ const methodOverride = require('method-override');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const DATABASE_URL = process.env.DATABASE_URL;
-const SECRET_KEY = process.env.SECRET_KEY;
+const SECURE_KEY = process.env.SECURE_KEY;
 const GoogleSpreadsheet = require("google-spreadsheet");
 const creds = {
   "type": process.env.TYPE,
@@ -226,7 +226,7 @@ const createGroup = (req, res) => {
           const token = jwt.sign({
               id: result.rows[0].id
             },
-            SECRET_KEY
+            SECURE_KEY
           );
           res.clearCookie('auth');
           res.cookie('auth', token);
@@ -251,7 +251,7 @@ const loginGroup = (req, res) => {
         const token = jwt.sign({
             id: result.rows[0].id
           },
-          SECRET_KEY
+          SECURE_KEY
         );
         res.clearCookie('auth');
         res.cookie('auth', token);
@@ -270,7 +270,7 @@ const loginGroup = (req, res) => {
 
 const updateGroup = (req, res) => {
   const handler = {
-    query: jwt.verify(req, SECRET_KEY, (err, decoded) => decoded.id),
+    query: jwt.verify(req, SECURE_KEY, (err, decoded) => decoded.id),
     cacheHit: result => {
       Group.update({ value: true, id: result.rows[0].id });
     },
@@ -283,7 +283,7 @@ const updateGroup = (req, res) => {
 }
 
 const addMember = (req, res) => {
-  const groupID = jwt.verify(req.cookies.auth, SECRET_KEY, (err, decoded) => decoded.id);
+  const groupID = jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id);
   const firstname = req.body.firstname;
   const lastname = req.body.lastname;
   const handler = {
@@ -309,7 +309,7 @@ const addMember = (req, res) => {
 }
 
 const updateMember = (req, res) => {
-  const groupID = jwt.verify(req.cookies.auth, SECRET_KEY, (err, decoded) => decoded.id);
+  const groupID = jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id);
   const firstname = req.body.firstname;
   const lastname = req.body.lastname;
   const currentName = req.body.currentname;
@@ -337,7 +337,7 @@ const updateMember = (req, res) => {
 }
 
 const deleteMember = (req, res) => {
-  const groupID = jwt.verify(req.cookies.auth, SECRET_KEY, (err, decoded) => decoded.id);
+  const groupID = jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id);
   const name = `${req.body.firstname} ${req.body.lastname}`;
   const handler = {
     query: {
