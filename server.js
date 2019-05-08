@@ -54,9 +54,7 @@ async.series(
     },
 
     function getInfoAndWorksheets(step) {
-      console.log("get data");
       doc.getInfo(function(err, info) {
-        console.log("Loaded doc: " + info.title + " by " + info.author.email);
         sheet = info.worksheets[0];
         
         sheet.getRows(
@@ -98,7 +96,7 @@ async.series(
 app.get('/', (req, res) => res.render('pages/index'));
 app.get('/login', (req, res) => res.render('pages/login'));
 app.get('/signup', (req, res) => res.render('pages/signup'));
-app.get('/dashboard', (req, res) => updateGroup(req.cookies.auth, res));
+app.get('/dashboard', (req, res) => renderDashboard(req, res));
 app.get('/groups', (req, res) => loginGroup(req.query, res));
 app.get('/payment', (req, res) => stripePayment(req, res));
 app.get(
@@ -140,9 +138,9 @@ const lookupGroup = handler => {
   return client
     .query(SQL, values)
     .then(results =>
-      !results.rows.length ?
-      handler.cacheMiss(results) :
-      handler.cacheHit(results)
+      !results.rows.length
+      ? handler.cacheMiss(results)
+      : handler.cacheHit(results)
     );
 };
 
@@ -152,14 +150,26 @@ const lookupMember = handler => {
   return client
     .query(SQL, values)
     .then(results =>
-      !results.rows.length ?
-      handler.cacheMiss(results) :
-      handler.cacheHit(results)
+      !results.rows.length
+      ? handler.cacheMiss(results)
+      : handler.cacheHit(results)
     );
 };
 
+const getMembers = groupID => {
+  const SQL = 'SELECT * FROM group_members WHERE group_id=$1';
+  const values = [groupID];
+  return client.query(SQL, values);
+}
+
+const getGames = groupID => {
+  const SQL = 'SELECT * FROM games WHERE group_id=$1';
+  const values = [groupID];
+  return client.query(SQL, values);
+}
+
 function Group(info) {
-  (this.name = info.name),
+  (this.name = info.groupname),
   (this.email = info.email),
   (this.password = info.password),
   (this.paid = false);
@@ -270,7 +280,7 @@ const loginGroup = (req, res) => {
 
 const updateGroup = (req, res) => {
   const handler = {
-    query: jwt.verify(req, SECURE_KEY, (err, decoded) => decoded.id),
+    query: req,
     cacheHit: result => {
       Group.update({ value: true, id: result.rows[0].id });
     },
@@ -354,6 +364,113 @@ const deleteMember = (req, res) => {
   }
 
   lookupMember(handler);
+}
+
+const renderDashboard = (req, res) => {
+  const groupID = jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id);
+  const handler = {
+    query: groupID,
+    cacheHit: results => {
+      updateGroup(groupID, res);
+      let members = [];
+      let teams = [];
+      let games = [];
+      let memberLeaderboard = [];
+      let teamLeaderboard = [];
+
+      function MemberStats(info) {
+        this.name = info.name,
+        this.wins = 0,
+        this.losses = 0,
+        this.winPercentage = 0
+        this.addWin = function() {
+          this.wins++;
+        },
+        this.addLoss = function() {
+          this.losses++;
+        },
+        this.calcWinPercentage = function() {
+          this.winPercentage = this.wins / (this.wins + this.losses);
+        };
+      }
+
+      function TeamStats(info) {
+        this.playerOne = info[0],
+        this.playerTwo = info[1],
+        this.wins = 0,
+        this.losses = 0,
+        this.winPercentage = 0
+        this.addWin = function() {
+          this.wins++;
+        },
+        this.addLoss = function() {
+          this.losses++;
+        },
+        this.calcWinPercentage = function() {
+          this.winPercentage = this.wins / (this.wins + this.losses);
+        };
+      }
+
+      getMembers(groupID)
+        .then(results => {
+          members = results.rows;
+          return getGames(groupID);
+        })
+        .then(results => {
+          games = results.rows;
+          members = members.map(member => { return { id: member.id, name: member.name } });
+          games = games.map(game => { return { date: parseInt(game.date), winning_team: game.winning_team, losing_team: game.losing_team, notes: game.notes }});
+          games.forEach(game => {
+            game.winning_team = game.winning_team.sort((a,b) => a - b);
+            game.losing_team = game.losing_team.sort((a,b) => a - b);
+            if (!teams.includes(game.winning_team)) {
+              teams.push(game.winning_team);
+            } else if (!teams.includes(game.losing_team)) {
+              teams.push(game.losing_team);
+            }
+          });
+          members.forEach(member => {
+            games.forEach(game => {
+              game.winning_team = game.winning_team.map(player => player === member.id ? member.name : player);
+              game.losing_team = game.losing_team.map(player => player === member.id ? member.name : player);
+            });
+            let newEntry = new MemberStats(member);
+            games.forEach(game => {
+              game.winning_team.includes(member.name)
+              ? newEntry.addWin()
+              : (game.losing_team.includes(member.name)
+                ? newEntry.addLoss()
+                : '');
+            })
+            newEntry.calcWinPercentage();
+            memberLeaderboard.push(newEntry);
+          });
+          members.forEach(member => {
+            teams.forEach((team, idx) => {
+              teams[idx] = team.map(player => player === member.id ? member.name : player );
+            });
+          })
+          teams.forEach(team => {
+            let newEntry = new TeamStats(team);
+            games.forEach(game => {
+              game.winning_team[0] === team[0] && game.winning_team[1] === team[1]
+              ? newEntry.addWin()
+              : (game.losing_team[0] === team[0] && game.losing_team[1] === team[1]
+                ? newEntry.addLoss()
+                : '');
+            })
+            newEntry.calcWinPercentage();
+            teamLeaderboard.push(newEntry);
+          });
+          res.render('pages/dashboard', { memberLeaderboard, teamLeaderboard });
+        });
+    },
+    cacheMiss: results => {
+      res.redirect('/login');
+    }
+  }
+
+  lookupGroup(handler);
 }
 
 app.listen(PORT, console.log(`App listening on ${PORT}.`));
