@@ -58,7 +58,7 @@ async.series(
       doc.getInfo(function(err, info) {
         console.log("Loaded doc: " + info.title + " by " + info.author.email);
         sheet = info.worksheets[0];
-        
+
         sheet.getRows(
           {
             offset: 1,
@@ -67,7 +67,7 @@ async.series(
           },
           function(err, rows) {
             let names =[];
-           
+
             rows.forEach((item, i)=> {
               //makes sure no duplicate names are in array
               names.push(item.team1player1)
@@ -105,13 +105,13 @@ app.get(
   '/logout',
   (req, res) => res.clearCookie('auth') && res.redirect('/login')
 );
-
 app.post('/groups', (req, res) => createGroup(req.body, res));
 app.post('/members', (req, res) => addMember(req, res));
 
 app.put('/members', (req, res) => updateMember(req, res));
 
 app.delete('/members', (req, res) => deleteMember(req, res));
+
 
 function stripePayment(req, res) {
   (async () => {
@@ -130,7 +130,7 @@ function stripePayment(req, res) {
     });
     res.render('pages/payment.ejs', {
       sessionId: session.id
-    });    
+    });
   })();
 }
 

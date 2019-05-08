@@ -1,0 +1,16 @@
+<table>
+  <tr>
+    <th>MEMBERS</th>
+    <th>WIN TOTAL</th>
+    <th>LOSS TOTAL</th>
+    <th>WIN PERCENTAGE</th>
+  </tr>
+  <% teamLeaderboard.forEach(team => { %>
+    <tr>
+      <td><%= team.members %></td>
+      <td><%= team.wins %></td>
+      <td><%= team.losses %></td>
+      <td><%= team.winPercentage %></td>
+    </tr>
+  <% }) %>
+</table>
