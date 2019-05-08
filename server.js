@@ -96,6 +96,7 @@ async.series(
 app.get('/', (req, res) => res.render('pages/index'));
 app.get('/login', (req, res) => res.render('pages/login'));
 app.get('/signup', (req, res) => res.render('pages/signup'));
+app.get('/about', (req, res) => res.render('pages/about'));
 app.get('/dashboard', (req, res) => renderDashboard(req, res));
 app.get('/groups', (req, res) => loginGroup(req.query, res));
 app.get('/payment', (req, res) => stripePayment(req, res));
