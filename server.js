@@ -85,7 +85,7 @@ app.use(
 app.get('/', (req, res) => res.render('pages/index'));
 app.get('/login', (req, res) => res.render('pages/login'));
 app.get('/signup', (req, res) => res.render('pages/signup'));
-app.get('/dashboard', (req, res) => console.log(req.cookies.auth));
+app.get('/dashboard', (req, res) => updateGroup(req.cookies.auth, res));
 app.get('/groups', (req, res) => loginGroup(req.body, res));
 app.get('/payment', (req, res) => stripePayment(req, res));
 app.get(
@@ -112,18 +112,18 @@ function stripePayment(req, res) {
         currency: 'usd',
         quantity: 1
       }],
-      success_url: 'https://localhost:3000/dashboard',
-      cancel_url: 'https://localhost:3000/'
+      success_url: 'https://card-game-score-history.herokuapp.com/dashboard',
+      cancel_url: 'https://card-game-score-history.herokuapp.com/'
     });
     res.render('pages/payment.ejs', {
       sessionId: session.id
-    })
+    });    
   })();
 }
 
 const lookupGroup = handler => {
-  const SQL = 'SELECT * FROM groups WHERE name=$1';
-  const values = [handler.query.name];
+  const SQL = handler.query.name ? 'SELECT * FROM groups WHERE name=$1' : 'SELECT * FROM groups WHERE id=$1';
+  const values = [handler.query.name ? handler.query.name : handler.query];
   return client
     .query(SQL, values)
     .then(results =>
@@ -164,6 +164,12 @@ Group.prototype.save = function () {
   return client.query(SQL, values);
 };
 
+Group.update = function (data) {
+  const SQL = 'UPDATE groups SET paid=$1 WHERE id=$2';
+  const values = [data.value, data.id];
+  return client.query(SQL, values);
+}
+
 Member.prototype.save = function () {
   const SQL = 'INSERT INTO group_members (name, group_id) VALUES($1,$2)';
   const values = [this.name, this.groupID];
@@ -199,8 +205,7 @@ const createGroup = (req, res) => {
       const groupInfo = {
         name: req.name,
         email: req.email,
-        password: hashedPassword,
-        paid: req.paid
+        password: hashedPassword
       };
       if (validation.every(result => result === true)) {
         const newGroup = new Group(groupInfo);
@@ -249,6 +254,20 @@ const loginGroup = (req, res) => {
 
   lookupGroup(handler);
 };
+
+const updateGroup = (req, res) => {
+  const handler = {
+    query: jwt.verify(req, SECRET, (err, decoded) => decoded.id),
+    cacheHit: result => {
+      Group.update({ value: true, id: result.rows[0].id });
+    },
+    cacheMiss: result => {
+      console.log('Group doesn\'t exist');
+    }
+  }
+
+  lookupGroup(handler);
+}
 
 const addMember = (req, res) => {
   const groupID = jwt.verify(req.cookies.auth, SECRET, (err, decoded) => decoded.id);
