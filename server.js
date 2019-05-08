@@ -96,7 +96,6 @@ async.series(
 app.get('/', (req, res) => res.render('pages/index'));
 app.get('/login', (req, res) => res.render('pages/login'));
 app.get('/signup', (req, res) => res.render('pages/signup'));
-// app.get('/dashboard', (req, res) => updateGroup(req.cookies.auth, res));
 app.get('/dashboard', (req, res) => renderDashboard(req, res));
 app.get('/groups', (req, res) => loginGroup(req.query, res));
 app.get('/payment', (req, res) => stripePayment(req, res));
@@ -139,9 +138,9 @@ const lookupGroup = handler => {
   return client
     .query(SQL, values)
     .then(results =>
-      !results.rows.length ?
-      handler.cacheMiss(results) :
-      handler.cacheHit(results)
+      !results.rows.length
+      ? handler.cacheMiss(results)
+      : handler.cacheHit(results)
     );
 };
 
@@ -151,9 +150,9 @@ const lookupMember = handler => {
   return client
     .query(SQL, values)
     .then(results =>
-      !results.rows.length ?
-      handler.cacheMiss(results) :
-      handler.cacheHit(results)
+      !results.rows.length
+      ? handler.cacheMiss(results)
+      : handler.cacheHit(results)
     );
 };
 
@@ -281,7 +280,7 @@ const loginGroup = (req, res) => {
 
 const updateGroup = (req, res) => {
   const handler = {
-    query: jwt.verify(req, SECURE_KEY, (err, decoded) => decoded.id),
+    query: req,
     cacheHit: result => {
       Group.update({ value: true, id: result.rows[0].id });
     },
@@ -372,6 +371,7 @@ const renderDashboard = (req, res) => {
   const handler = {
     query: groupID,
     cacheHit: results => {
+      updateGroup(groupID, res);
       let members = [];
       let teams = [];
       let games = [];
@@ -382,52 +382,50 @@ const renderDashboard = (req, res) => {
         this.name = info.name,
         this.wins = 0,
         this.losses = 0,
-        this.winPercentage = 0;
+        this.winPercentage = 0
+        this.addWin = function() {
+          this.wins++;
+        },
+        this.addLoss = function() {
+          this.losses++;
+        },
+        this.calcWinPercentage = function() {
+          this.winPercentage = this.wins / (this.wins + this.losses);
+        };
       }
 
       function TeamStats(info) {
-        this.playerOne = info.playerOne,
-        this.playerTwo = info.playerTwo,
+        this.playerOne = info[0],
+        this.playerTwo = info[1],
         this.wins = 0,
         this.losses = 0,
-        this.winPercentage = 0;
-      }
-
-      MemberStats.prototype.addWin = function() {
-        this.wins++;
-      }
-
-      MemberStats.prototype.addLoss = function() {
-        this.losses++;
-      }
-
-      MemberStats.prototype.calcWinPercentage = function() {
-        this.winPercentage = this.wins / (this.wins + this.losses);
-      }
-      
-      TeamStats.prototype.addWin = function() {
-        this.wins++;
-      }
-
-      TeamStats.prototype.addLoss = function() {
-        this.losses++;
-      }
-
-      TeamStats.prototype.calcWinPercentage = function() {
-        this.winPercentage = this.wins / (this.wins + this.losses);
+        this.winPercentage = 0
+        this.addWin = function() {
+          this.wins++;
+        },
+        this.addLoss = function() {
+          this.losses++;
+        },
+        this.calcWinPercentage = function() {
+          this.winPercentage = this.wins / (this.wins + this.losses);
+        };
       }
 
       getMembers(groupID)
-        .then(results => members = results.rows)
-        .then(() => getGames(groupID))
-        .then(results => games = results.rows)
-        .then(() => members = members.map(member => { return { id: member.id, name: member.name } }))
-        .then(() => games = games.map(game => { return { date: parseInt(game.date), winning_team: game.winning_team, losing_team: game.losing_team, notes: game.notes }}))
-        .then(() => {
+        .then(results => {
+          members = results.rows;
+          return getGames(groupID);
+        })
+        .then(results => {
+          games = results.rows;
+          members = members.map(member => { return { id: member.id, name: member.name } });
+          games = games.map(game => { return { date: parseInt(game.date), winning_team: game.winning_team, losing_team: game.losing_team, notes: game.notes }});
           games.forEach(game => {
-            if (!teams.includes(game.winning_team.sort((a,b) => a - b))) {
+            game.winning_team = game.winning_team.sort((a,b) => a - b);
+            game.losing_team = game.losing_team.sort((a,b) => a - b);
+            if (!teams.includes(game.winning_team)) {
               teams.push(game.winning_team);
-            } else if (!teams.includes(game.losing_team.sort((a,b) => a - b))) {
+            } else if (!teams.includes(game.losing_team)) {
               teams.push(game.losing_team);
             }
           });
@@ -446,12 +444,26 @@ const renderDashboard = (req, res) => {
             })
             newEntry.calcWinPercentage();
             memberLeaderboard.push(newEntry);
+          });
+          members.forEach(member => {
+            teams.forEach((team, idx) => {
+              teams[idx] = team.map(player => player === member.id ? member.name : player );
+            });
           })
-        })
-        .then(() => {
-          
-        })
-        .then(() => console.log(teamLeaderboard));
+          teams.forEach(team => {
+            let newEntry = new TeamStats(team);
+            games.forEach(game => {
+              game.winning_team[0] === team[0] && game.winning_team[1] === team[1]
+              ? newEntry.addWin()
+              : (game.losing_team[0] === team[0] && game.losing_team[1] === team[1]
+                ? newEntry.addLoss()
+                : '');
+            })
+            newEntry.calcWinPercentage();
+            teamLeaderboard.push(newEntry);
+          });
+          res.render('pages/dashboard', { memberLeaderboard, teamLeaderboard });
+        });
     },
     cacheMiss: results => {
       res.redirect('/login');
