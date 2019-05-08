@@ -378,6 +378,7 @@ const renderDashboard = (req, res) => {
       let memberLeaderboard = [];
       let teamLeaderboard = [];
 
+      // CONSTRUCTOR FOR EACH memberLeaderboard ENTRY
       function MemberStats(info) {
         this.name = info.name,
         this.wins = 0,
@@ -394,6 +395,7 @@ const renderDashboard = (req, res) => {
         };
       }
 
+      // CONSTRUCTOR FOR EACH teamLeaderboard ENTRY
       function TeamStats(info) {
         this.playerOne = info[0],
         this.playerTwo = info[1],
@@ -411,18 +413,25 @@ const renderDashboard = (req, res) => {
         };
       }
 
+      // GATHER LIST OF MEMBERS FROM DATABASE
       getMembers(groupID)
         .then(results => {
           members = results.rows;
+          // GATHER LIST OF GAME ENTRY FROM DATABASE
           return getGames(groupID);
         })
         .then(results => {
           games = results.rows;
+          // CONVERT EACH members ENTRY INTO AN OBJECT WITH ONLY RELEVANT INFORMATION
           members = members.map(member => { return { id: member.id, name: member.name } });
+          // CONVERT EACH games ENTRY INTO AN OBJECT WITH ONLY RELEVANT INFORMATION
           games = games.map(game => { return { date: parseInt(game.date), winning_team: game.winning_team, losing_team: game.losing_team, notes: game.notes }});
+          // STANDARDIZE EACH games ENTRY
           games.forEach(game => {
+            // SORT winning_team and losing_team ARRAYS FOR FUTURE COMPARISON USE
             game.winning_team = game.winning_team.sort((a,b) => a - b);
             game.losing_team = game.losing_team.sort((a,b) => a - b);
+            // PUSH UNIQUE TEAM CONFIGURATIONS TO THE teams ARRAY
             if (!teams.includes(game.winning_team)) {
               teams.push(game.winning_team);
             } else if (!teams.includes(game.losing_team)) {
@@ -430,11 +439,14 @@ const renderDashboard = (req, res) => {
             }
           });
           members.forEach(member => {
+            // CONVERT THE INTEGERS IN winning_team AND losing_team ARRAYS TO THEIR MEMBER NAME
             games.forEach(game => {
               game.winning_team = game.winning_team.map(player => player === member.id ? member.name : player);
               game.losing_team = game.losing_team.map(player => player === member.id ? member.name : player);
             });
+            // INSTANTIATE NEW memberLeaderboard ENTRY
             let newEntry = new MemberStats(member);
+            // CALCULATE TOTAL WINS AND TOTAL LOSSES FOR NEW memberLeaderboard ENTRY
             games.forEach(game => {
               game.winning_team.includes(member.name)
               ? newEntry.addWin()
@@ -442,16 +454,20 @@ const renderDashboard = (req, res) => {
                 ? newEntry.addLoss()
                 : '');
             })
+            // CALCULATE winPercentage FOR NEW memberLeaderboard ENTRY
             newEntry.calcWinPercentage();
             memberLeaderboard.push(newEntry);
           });
+          // CONVERT THE teams IDs TO member NAMES
           members.forEach(member => {
             teams.forEach((team, idx) => {
               teams[idx] = team.map(player => player === member.id ? member.name : player );
             });
-          })
+          });
           teams.forEach(team => {
+            // INSTANTIATE NEW teamLeaderboard ENTRY
             let newEntry = new TeamStats(team);
+            // CALCULATE TOTAL WINS AND LOSSES FOR NEW teamLederboard ENTRY
             games.forEach(game => {
               game.winning_team[0] === team[0] && game.winning_team[1] === team[1]
               ? newEntry.addWin()
@@ -459,9 +475,11 @@ const renderDashboard = (req, res) => {
                 ? newEntry.addLoss()
                 : '');
             })
+            // CALCULATE winPercentage FOR NEW teamLeaderboard ENTRY
             newEntry.calcWinPercentage();
             teamLeaderboard.push(newEntry);
           });
+          // RENDER THE dashboard PAGE AND PASS THE LEADERBOARDS TO IT
           res.render('pages/dashboard', { memberLeaderboard, teamLeaderboard });
         });
     },
