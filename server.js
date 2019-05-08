@@ -54,9 +54,7 @@ async.series(
     },
 
     function getInfoAndWorksheets(step) {
-      console.log("get data");
       doc.getInfo(function(err, info) {
-        console.log("Loaded doc: " + info.title + " by " + info.author.email);
         sheet = info.worksheets[0];
         
         sheet.getRows(
@@ -98,7 +96,8 @@ async.series(
 app.get('/', (req, res) => res.render('pages/index'));
 app.get('/login', (req, res) => res.render('pages/login'));
 app.get('/signup', (req, res) => res.render('pages/signup'));
-app.get('/dashboard', (req, res) => updateGroup(req.cookies.auth, res));
+// app.get('/dashboard', (req, res) => updateGroup(req.cookies.auth, res));
+app.get('/dashboard', (req, res) => renderDashboard(req, res));
 app.get('/groups', (req, res) => loginGroup(req.query, res));
 app.get('/payment', (req, res) => stripePayment(req, res));
 app.get(
@@ -158,8 +157,20 @@ const lookupMember = handler => {
     );
 };
 
+const getMembers = groupID => {
+  const SQL = 'SELECT * FROM group_members WHERE group_id=$1';
+  const values = [groupID];
+  return client.query(SQL, values);
+}
+
+const getGames = groupID => {
+  const SQL = 'SELECT * FROM games WHERE group_id=$1';
+  const values = [groupID];
+  return client.query(SQL, values);
+}
+
 function Group(info) {
-  (this.name = info.name),
+  (this.name = info.groupname),
   (this.email = info.email),
   (this.password = info.password),
   (this.paid = false);
@@ -354,6 +365,67 @@ const deleteMember = (req, res) => {
   }
 
   lookupMember(handler);
+}
+
+const renderDashboard = (req, res) => {
+  const groupID = jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id);
+  const handler = {
+    query: groupID,
+    cacheHit: results => {
+      let members = [];
+      let games = [];
+      let memberLeaderboard = [];
+      let teamLeaderboard = [];
+
+      function MemberStats(info) {
+        this.name = info.name,
+        this.wins = 0,
+        this.losses = 0,
+        this.winPercentage = 0;
+      }
+
+      MemberStats.prototype.addWin = function() {
+        this.wins++;
+      }
+
+      MemberStats.prototype.addLoss = function() {
+        this.losses++;
+      }
+
+      MemberStats.prototype.calcWinPercentage = function() {
+        this.winPercentage = this.wins / (this.wins + this.losses);
+      }
+
+      getMembers(groupID)
+        .then(results => members = results.rows)
+        .then(() => getGames(groupID))
+        .then(results => games = results.rows)
+        .then(() => members = members.map(member => { return { id: member.id, name: member.name } }))
+        .then(() => games = games.map(game => { return { date: parseInt(game.date), winning_team: game.winning_team, losing_team: game.losing_team, notes: game.notes }}))
+        .then(() => members.forEach(member => {
+          games.forEach(game => {
+            game.winning_team = game.winning_team.map(player => player === member.id ? member.name : player);
+            game.losing_team = game.losing_team.map(player => player === member.id ? member.name : player);
+          });
+          let newEntry = new MemberStats(member);
+          games.forEach(game => {
+            game.winning_team.includes(member.name)
+            ? newEntry.addWin()
+            : (game.losing_team.includes(member.name)
+              ? newEntry.addLoss()
+              : '');
+          })
+          newEntry.calcWinPercentage();
+          memberLeaderboard.push(newEntry);
+        }))
+        .then(() => console.log(memberLeaderboard));
+    },
+    cacheMiss: results => {
+      console.log('Group does not exist');
+    }
+  }
+
+  lookupGroup(handler);
 }
 
 app.listen(PORT, console.log(`App listening on ${PORT}.`));
