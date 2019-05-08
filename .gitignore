@@ -59,6 +59,3 @@ typings/
 
 # next.js build output
 .next
-
-# Google Sheets
-client_secret.json

@@ -9,12 +9,23 @@ const methodOverride = require('method-override');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const DATABASE_URL = process.env.DATABASE_URL;
-const SECRET = process.env.SECRET;
+const SECURE_KEY = process.env.SECURE_KEY;
 const GoogleSpreadsheet = require("google-spreadsheet");
-const creds = require("./client_secret.json");
+const creds = {
+  "type": process.env.TYPE,
+  "project_id": process.env.PROJECT_ID,
+  "private_key_id": process.env.PRIVATE_KEY_ID,
+  "private_key": process.env.PRIVATE_KEY,
+  "client_email": process.env.CLIENT_EMAIL,
+  "client_id": process.env.CLIENT_ID,
+  "auth_uri": process.env.AUTH_URI,
+  "token_uri": process.env.TOKEN_URI,
+  "auth_provider_x509_cert_url": process.env.AUTH_PROVIDER_X509_CERT_URL,
+  "client_x509_cert_url": process.env.CLIENT_X509_CERT_URL
+};
 const async = require("async");
-const SECRET_KEY_TEST = process.env.SECRET_KEY_TEST;
-const stripe = require('stripe')(SECRET_KEY_TEST);
+const STRIPE_SECRET_KEY_TEST = process.env.STRIPE_SECRET_KEY_TEST;
+const stripe = require('stripe')(STRIPE_SECRET_KEY_TEST);
 
 app.set('view engine', 'ejs');
 
@@ -23,6 +34,8 @@ app.use(
     extended: true
   })
 );
+
+app.use(express.static('./public'));
 
 app.use(cookieParser());
 app.use(methodOverride('_method'));
@@ -86,7 +99,7 @@ app.get('/', (req, res) => res.render('pages/index'));
 app.get('/login', (req, res) => res.render('pages/login'));
 app.get('/signup', (req, res) => res.render('pages/signup'));
 app.get('/dashboard', (req, res) => updateGroup(req.cookies.auth, res));
-app.get('/groups', (req, res) => loginGroup(req.body, res));
+app.get('/groups', (req, res) => loginGroup(req.query, res));
 app.get('/payment', (req, res) => stripePayment(req, res));
 app.get(
   '/logout',
@@ -122,8 +135,8 @@ function stripePayment(req, res) {
 }
 
 const lookupGroup = handler => {
-  const SQL = handler.query.name ? 'SELECT * FROM groups WHERE name=$1' : 'SELECT * FROM groups WHERE id=$1';
-  const values = [handler.query.name ? handler.query.name : handler.query];
+  const SQL = handler.query.groupname ? 'SELECT * FROM groups WHERE name=$1' : 'SELECT * FROM groups WHERE id=$1';
+  const values = [handler.query.groupname ? handler.query.groupname : handler.query];
   return client
     .query(SQL, values)
     .then(results =>
@@ -153,7 +166,7 @@ function Group(info) {
 }
 
 function Member(info) {
-  (this.name = info.name),
+  (this.name = info.groupname),
   (this.groupID = info.groupID);
 }
 
@@ -203,7 +216,7 @@ const createGroup = (req, res) => {
     cacheMiss: result => {
       const hashedPassword = bcrypt.hashSync(req.password, 8);
       const groupInfo = {
-        name: req.name,
+        groupname: req.groupname,
         email: req.email,
         password: hashedPassword
       };
@@ -213,7 +226,7 @@ const createGroup = (req, res) => {
           const token = jwt.sign({
               id: result.rows[0].id
             },
-            SECRET
+            SECURE_KEY
           );
           res.clearCookie('auth');
           res.cookie('auth', token);
@@ -238,7 +251,7 @@ const loginGroup = (req, res) => {
         const token = jwt.sign({
             id: result.rows[0].id
           },
-          SECRET
+          SECURE_KEY
         );
         res.clearCookie('auth');
         res.cookie('auth', token);
@@ -257,7 +270,7 @@ const loginGroup = (req, res) => {
 
 const updateGroup = (req, res) => {
   const handler = {
-    query: jwt.verify(req, SECRET, (err, decoded) => decoded.id),
+    query: jwt.verify(req, SECURE_KEY, (err, decoded) => decoded.id),
     cacheHit: result => {
       Group.update({ value: true, id: result.rows[0].id });
     },
@@ -270,7 +283,7 @@ const updateGroup = (req, res) => {
 }
 
 const addMember = (req, res) => {
-  const groupID = jwt.verify(req.cookies.auth, SECRET, (err, decoded) => decoded.id);
+  const groupID = jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id);
   const firstname = req.body.firstname;
   const lastname = req.body.lastname;
   const handler = {
@@ -296,7 +309,7 @@ const addMember = (req, res) => {
 }
 
 const updateMember = (req, res) => {
-  const groupID = jwt.verify(req.cookies.auth, SECRET, (err, decoded) => decoded.id);
+  const groupID = jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id);
   const firstname = req.body.firstname;
   const lastname = req.body.lastname;
   const currentName = req.body.currentname;
@@ -324,7 +337,7 @@ const updateMember = (req, res) => {
 }
 
 const deleteMember = (req, res) => {
-  const groupID = jwt.verify(req.cookies.auth, SECRET, (err, decoded) => decoded.id);
+  const groupID = jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id);
   const name = `${req.body.firstname} ${req.body.lastname}`;
   const handler = {
     query: {

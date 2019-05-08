@@ -5,9 +5,9 @@
 <body>
   <%- include ../partials/main-nav.ejs %>
   <section class="flex-container">
-    <form class="flex-container" action="/groups" method="get">
-      <input name="email" placeholder="email" />
-      <input name="password" placeholder="password" />
+    <form class="flex-container" action="/groups" method="GET">
+      <input name="groupname" type="text" placeholder="Group Name" />
+      <input name="password" type="password" placeholder="Password" />
       <button type="submit" class="button-lg blue">
         Sign In
       </button>
