@@ -11,11 +11,9 @@ const PORT = process.env.PORT || 3000;
 const DATABASE_URL = process.env.DATABASE_URL;
 const SECRET = process.env.SECRET;
 const GoogleSpreadsheet = require("google-spreadsheet");
-const { promisify } = require("util");
 const creds = require("./client_secret.json");
 const async = require("async");
 const SECRET_KEY_TEST = process.env.SECRET_KEY_TEST;
-const PUBLISHABLE_KEY_TEST = process.env.PUBLISHABLE_KEY_TEST;
 const stripe = require('stripe')(SECRET_KEY_TEST);
 
 app.set('view engine', 'ejs');
@@ -38,39 +36,38 @@ const doc = new GoogleSpreadsheet(
 async.series(
   [
     function setAuth(step) {
-      console.log("set auth");
+      // console.log("set auth");
 
       doc.useServiceAccountAuth(creds, step);
     },
 
     function getInfoAndWorksheets(step) {
-      console.log("get data");
-      doc.getInfo(function(err, info) {
-        console.log("Loaded doc: " + info.title + " by " + info.author.email);
+      // console.log("get data");
+      doc.getInfo(function (err, info) {
+        // console.log("Loaded doc: " + info.title + " by " + info.author.email);
         sheet = info.worksheets[0];
-        console.log(
-          "sheet 1: " +
-            sheet.title +
-            " " +
-            sheet.rowCount +
-            "x" +
-            sheet.colCount
-        );
-        sheet.getRows(
-          {
+        // console.log(
+        //   "sheet 1: " +
+        //   sheet.title +
+        //   " " +
+        //   sheet.rowCount +
+        //   "x" +
+        //   sheet.colCount
+        // );
+        sheet.getRows({
             offset: 1,
             limit: 20,
             orderby: "col2"
           },
-          function(err, rows) {
-            console.log(rows);
+          function (err, rows) {
+            // console.log(rows);
           }
         );
         step();
       });
     }
   ],
-  function(err) {
+  function (err) {
     if (err) {
       console.log("ERROR:" + err);
     }
@@ -87,7 +84,8 @@ app.use(
 
 app.get('/', (req, res) => res.render('pages/index'));
 app.get('/login', (req, res) => res.render('pages/login'));
-app.get('/dashboard', (req, res) => console.log(req.cookies.auth));
+app.get('/signup', (req, res) => res.render('pages/signup'));
+app.get('/dashboard', (req, res) => updateGroup(req.cookies.auth, res));
 app.get('/groups', (req, res) => loginGroup(req.body, res));
 app.get('/payment', (req, res) => stripePayment(req, res));
 app.get(
@@ -114,18 +112,18 @@ function stripePayment(req, res) {
         currency: 'usd',
         quantity: 1
       }],
-      success_url: 'https://localhost:3000/dashboard',
-      cancel_url: 'https://localhost:3000/'
+      success_url: 'https://card-game-score-history.herokuapp.com/dashboard',
+      cancel_url: 'https://card-game-score-history.herokuapp.com/'
     });
     res.render('pages/payment.ejs', {
       sessionId: session.id
-    })
+    });    
   })();
 }
 
 const lookupGroup = handler => {
-  const SQL = 'SELECT * FROM groups WHERE name=$1';
-  const values = [handler.query.name];
+  const SQL = handler.query.name ? 'SELECT * FROM groups WHERE name=$1' : 'SELECT * FROM groups WHERE id=$1';
+  const values = [handler.query.name ? handler.query.name : handler.query];
   return client
     .query(SQL, values)
     .then(results =>
@@ -151,7 +149,7 @@ function Group(info) {
   (this.name = info.name),
   (this.email = info.email),
   (this.password = info.password),
-  (this.paid = info.paid);
+  (this.paid = false);
 }
 
 function Member(info) {
@@ -165,6 +163,12 @@ Group.prototype.save = function () {
   const values = [this.name, this.email, this.password, this.paid];
   return client.query(SQL, values);
 };
+
+Group.update = function (data) {
+  const SQL = 'UPDATE groups SET paid=$1 WHERE id=$2';
+  const values = [data.value, data.id];
+  return client.query(SQL, values);
+}
 
 Member.prototype.save = function () {
   const SQL = 'INSERT INTO group_members (name, group_id) VALUES($1,$2)';
@@ -201,8 +205,7 @@ const createGroup = (req, res) => {
       const groupInfo = {
         name: req.name,
         email: req.email,
-        password: hashedPassword,
-        paid: req.paid
+        password: hashedPassword
       };
       if (validation.every(result => result === true)) {
         const newGroup = new Group(groupInfo);
@@ -214,7 +217,7 @@ const createGroup = (req, res) => {
           );
           res.clearCookie('auth');
           res.cookie('auth', token);
-          res.redirect('/dashboard');
+          res.redirect('/payment');
         });
       }
     }
@@ -251,6 +254,20 @@ const loginGroup = (req, res) => {
 
   lookupGroup(handler);
 };
+
+const updateGroup = (req, res) => {
+  const handler = {
+    query: jwt.verify(req, SECRET, (err, decoded) => decoded.id),
+    cacheHit: result => {
+      Group.update({ value: true, id: result.rows[0].id });
+    },
+    cacheMiss: result => {
+      console.log('Group doesn\'t exist');
+    }
+  }
+
+  lookupGroup(handler);
+}
 
 const addMember = (req, res) => {
   const groupID = jwt.verify(req.cookies.auth, SECRET, (err, decoded) => decoded.id);
