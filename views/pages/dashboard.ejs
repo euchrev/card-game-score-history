@@ -7,15 +7,15 @@
   <main>
     <header class="dashboard-header">
       <ul>
-        <li><a href="">TEAMS</a></li>
-        <li><a href="">MEMBERS</a></li>
-        <li><a href="">SETTINGS</a></li>
+        <li><button>TEAMS</button></li>
+        <li><button>MEETINGS</button></li>
+        <li><button>SETTINGS</button></li>
       </ul>
     </header>
 
-    <%- include ../partials/members.ejs %>
+    <%- include (../partials/members.ejs, {memberLeaderboard}) %>
 
-    <%- include ../partials/teams.ejs %>
+    <%- include (../partials/teams.ejs, {teamLeaderboard} %>
 
     <%- include ../partials/settings.ejs %>
 

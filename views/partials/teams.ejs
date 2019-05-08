@@ -1,16 +1,18 @@
 <table id="teams-leaderboard">
-  <tr>
-    <th>MEMBERS</th>
-    <th>WIN TOTAL</th>
-    <th>LOSS TOTAL</th>
-    <th>WIN PERCENTAGE</th>
-  </tr>
-  <% teamLeaderboard.forEach(team => { %>
+  <thead>
     <tr>
-      <td><%= team.members %></td>
-      <td><%= team.wins %></td>
-      <td><%= team.losses %></td>
-      <td><%= team.winPercentage %></td>
+      <th>MEMBERS</th>
+      <th>WIN TOTAL</th>
+      <th>LOSS TOTAL</th>
+      <th>WIN PERCENTAGE</th>
     </tr>
+  </thead>
+  <% teamLeaderboard.forEach(team => { %>
+  <tr>
+    <td class="table-name"><%= team.members %></td>
+    <td><%= team.wins %></td>
+    <td><%= team.losses %></td>
+    <td><%= team.winPercentage %></td>
+  </tr>
   <% }) %>
 </table>

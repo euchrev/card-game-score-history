@@ -47,6 +47,12 @@ a {
   background-color: #fff !important;
   border: 2px solid #1c2260;
 }
+
+table {
+  border-collapse: collapse;
+  width: 90%;
+}
+
 @media only screen and (max-width: 767px) {
   h1 {
     font-size: 27px;
