@@ -373,12 +373,21 @@ const renderDashboard = (req, res) => {
     query: groupID,
     cacheHit: results => {
       let members = [];
+      let teams = [];
       let games = [];
       let memberLeaderboard = [];
       let teamLeaderboard = [];
 
       function MemberStats(info) {
         this.name = info.name,
+        this.wins = 0,
+        this.losses = 0,
+        this.winPercentage = 0;
+      }
+
+      function TeamStats(info) {
+        this.playerOne = info.playerOne,
+        this.playerTwo = info.playerTwo,
         this.wins = 0,
         this.losses = 0,
         this.winPercentage = 0;
@@ -395,6 +404,18 @@ const renderDashboard = (req, res) => {
       MemberStats.prototype.calcWinPercentage = function() {
         this.winPercentage = this.wins / (this.wins + this.losses);
       }
+      
+      TeamStats.prototype.addWin = function() {
+        this.wins++;
+      }
+
+      TeamStats.prototype.addLoss = function() {
+        this.losses++;
+      }
+
+      TeamStats.prototype.calcWinPercentage = function() {
+        this.winPercentage = this.wins / (this.wins + this.losses);
+      }
 
       getMembers(groupID)
         .then(results => members = results.rows)
@@ -402,26 +423,38 @@ const renderDashboard = (req, res) => {
         .then(results => games = results.rows)
         .then(() => members = members.map(member => { return { id: member.id, name: member.name } }))
         .then(() => games = games.map(game => { return { date: parseInt(game.date), winning_team: game.winning_team, losing_team: game.losing_team, notes: game.notes }}))
-        .then(() => members.forEach(member => {
+        .then(() => {
           games.forEach(game => {
-            game.winning_team = game.winning_team.map(player => player === member.id ? member.name : player);
-            game.losing_team = game.losing_team.map(player => player === member.id ? member.name : player);
+            if (!teams.includes(game.winning_team.sort((a,b) => a - b))) {
+              teams.push(game.winning_team);
+            } else if (!teams.includes(game.losing_team.sort((a,b) => a - b))) {
+              teams.push(game.losing_team);
+            }
           });
-          let newEntry = new MemberStats(member);
-          games.forEach(game => {
-            game.winning_team.includes(member.name)
-            ? newEntry.addWin()
-            : (game.losing_team.includes(member.name)
-              ? newEntry.addLoss()
-              : '');
+          members.forEach(member => {
+            games.forEach(game => {
+              game.winning_team = game.winning_team.map(player => player === member.id ? member.name : player);
+              game.losing_team = game.losing_team.map(player => player === member.id ? member.name : player);
+            });
+            let newEntry = new MemberStats(member);
+            games.forEach(game => {
+              game.winning_team.includes(member.name)
+              ? newEntry.addWin()
+              : (game.losing_team.includes(member.name)
+                ? newEntry.addLoss()
+                : '');
+            })
+            newEntry.calcWinPercentage();
+            memberLeaderboard.push(newEntry);
           })
-          newEntry.calcWinPercentage();
-          memberLeaderboard.push(newEntry);
-        }))
-        .then(() => console.log(memberLeaderboard));
+        })
+        .then(() => {
+          
+        })
+        .then(() => console.log(teamLeaderboard));
     },
     cacheMiss: results => {
-      console.log('Group does not exist');
+      res.redirect('/login');
     }
   }
 
