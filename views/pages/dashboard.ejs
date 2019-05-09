@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%- include ../partials/head.ejs %>
+
+  <body>
+    <main>
+      <form class="dashboard-form">
+        <label for="team-radio">TEAMS</label>
+        <input type="radio" name="dashboard-state" id="team-radio" checked />
+        <section class="dashboard-wrapper">
+          <%- include('../partials/teams.ejs', {teamLeaderboard}) %>
+        </section>
+        <label for="member-radio">MEMBERS</label>
+        <input type="radio" name="dashboard-state" id="member-radio" />
+        <section class="dashboard-wrapper">
+          <%- include('../partials/membersLeaderboard.ejs', {memberLeaderboard})
+          %>
+        </section>
+        <label for="settings-radio">SETTINGS</label>
+        <input type="radio" name="dashboard-state" id="settings-radio" />
+        <section class="dashboard-wrapper">
+          <%- include('../partials/settings.ejs') %>
+        </section>
+      </form>
+    </main>
+  </body>
+</html>

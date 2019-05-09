@@ -7,10 +7,12 @@ nav {
   margin: 0;
   padding: 0;
 }
+
 .img-fluid {
   max-width: 100%;
   height: auto;
 }
+
 body {
   background-color: #dfe3e8;
   width: 100%;
@@ -63,6 +65,12 @@ a {
   background-color: #fff !important;
   border: 2px solid #1c2260;
 }
+
+table {
+  border-collapse: collapse;
+  width: 90%;
+}
+
 .bio {
   width: 200px;
   margin: 10px;

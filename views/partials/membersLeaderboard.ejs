@@ -1,0 +1,25 @@
+<table class="dashboard-table" id="members-leaderboard">
+  <thead>
+    <tr>
+      <th class="table-name">NAME</th>
+      <th>WIN TOTAL</th>
+      <th>LOSS TOTAL</th>
+      <th>WIN PERCENTAGE</th>
+    </tr>
+  </thead>
+
+  <% memberLeaderboard.forEach(member => { %>
+  <tr>
+    <td class="table-name"><%= member.name %></td>
+    <td><%= member.wins %></td>
+    <td><%= member.losses %></td>
+    <td><%= Math.floor(member.winPercentage * 100) %> %</td>
+  </tr>
+  <% }) %>
+  <tfoot>
+    <tr>
+      <th><a href="pages/settings.ejs">ADD NEW MEMBER</a></th>
+
+    </tr>
+  </tfoot>
+</table>
