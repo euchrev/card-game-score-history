@@ -1,7 +1,6 @@
 .dashboard-form input[type="radio"] {
   display: none;
 }
-
 .dashboard-form label {
   position: relative;
   display: inline-block;
@@ -19,8 +18,9 @@
 .dashboard-form .dashboard-wrapper {
   position: absolute;
   display: none;
-  top: 25%;
-  left: calc(50% - )
+  top: 30%;
+  width: 80%;
+  left: 13%;
 }
 
 .dashboard-form input[type="radio"]:checked + .dashboard-wrapper {
