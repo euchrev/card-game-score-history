@@ -197,22 +197,6 @@ table {
   min-height: 100vh;
 }
 
-.stripe button {
-  height: 30px;
-  width: 150px;
-  font-size: 1.2em;
-  background-color: transparent;
-  border: 2px solid #222;
-  color: #222;
-  transition: all .3s ease;
-}
-
-.stripe button:hover {
-  transform: scale(1.2);
-  background-color: #222;
-  color: #fff;
-}
-
 @media only screen and (max-width: 767px) {
   h1 {
     font-size: 27px;

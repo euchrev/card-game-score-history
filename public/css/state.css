@@ -30,3 +30,10 @@
 .dashboard-form input[type="radio"]:focus {
   text-decoration: underline;
 }
+
+.stripe button:hover,
+footer button:hover {
+  transform: scale(1.2);
+  background-color: #222;
+  color: #fff;
+}
