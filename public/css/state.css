@@ -5,14 +5,22 @@
   position: relative;
   display: inline-block;
   margin: 20px 30px;
+  border: 1px solid #1c2260;
+  padding: 20px 30px;
+  cursor: pointer;
+}
+
+.dashboard-form label:hover {
+  background-color: #1c2260;
+  color: #fff;
 }
 
 .dashboard-form .dashboard-wrapper {
   position: absolute;
   display: none;
   top: 30%;
-  left: 10%;
   width: 80%;
+  left: 13%;
 }
 
 .dashboard-form input[type="radio"]:checked + .dashboard-wrapper {

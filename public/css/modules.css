@@ -11,6 +11,8 @@
 
 .dashboard-header ul li button {
   cursor: pointer;
+  color: #1c2260;
+  background-color: #dfe3e8;
 }
 
 .dashboard-wrapper {
@@ -23,6 +25,11 @@
   margin: 0 auto;
 }
 
+.dashboard-wrapper h2 {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
 /* LEADERBOARD TABLES ======================= */
 
 .table-name {
@@ -32,20 +39,30 @@
 table {
   max-width: 80%;
   /* margin: 0 auto; */
+  width: 1000px;
+  height: 600px;
+  overflow-y: scroll;
+  margin: 0 auto;
+  display: block;
 }
 
 thead {
-  border-bottom: 2px solid #000;
+  border-bottom: 2px solid #1c2260;
 }
 
 table th {
   padding: 10px 20px;
+  text-align: left;
+}
+
+.align-right {
+  text-align: right;
 }
 
 table td {
-  padding: 10px 20px;
+  padding: 20px 20px;
   text-align: right;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid #1c2260;
 }
 
 table tfoot th a {
@@ -53,6 +70,7 @@ table tfoot th a {
   color: #fff;
   font-size: 0.9rem;
   padding: 10px 20px;
+  margin-top: 20px;
 }
 
 tfoot {

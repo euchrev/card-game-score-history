@@ -136,23 +136,19 @@ const doc = new GoogleSpreadsheet(
 //   }
 // );
 
-app.get("/", (req, res) => res.render("pages/index"));
-app.get("/login", (req, res) => res.render("pages/login"));
-app.get("/signup", (req, res) => res.render("pages/signup"));
-app.get("/about", (req, res) => res.render("pages/about"));
-app.get("/dashboard", (req, res) => renderDashboard(req, res));
-app.get("/groups", (req, res) => loginGroup(req.query, res));
-app.get("/payment", (req, res) => stripePayment(req, res));
-app.get(
-  "/logout",
-  (req, res) => res.clearCookie("auth") && res.redirect("/login")
-);
-app.get("/new-game", (req, res) => newGameScore(req, res));
-app.get("/gamescore", (req, res) => newGameScore(req, res));
-app.post("/groups", (req, res) => createGroup(req.body, res));
-app.post("/members", (req, res) => addMember(req, res));
-app.put("/members", (req, res) => updateMember(req, res));
-app.delete("/members", (req, res) => deleteMember(req, res));
+app.get('/', (req, res) => res.render('pages/index'));
+app.get('/signup', (req, res) => res.render('pages/signup'));
+app.get('/about', (req, res) => res.render('pages/about'));
+app.get('/dashboard', (req, res) => renderDashboard(req, res));
+app.post('/login', (req, res) => loginGroup(req.body, res));
+app.get('/payment', (req, res) => stripePayment(req, res));
+app.get( '/logout', (req, res) => res.clearCookie('auth') && res.redirect('/login'));
+app.get('/new-game',(req, res) => newGameScore(req, res));
+app.post('/games', (req, res) => addGame(req.body, res));
+app.post('/groups', (req, res) => createGroup(req.body, res));
+app.post('/members', (req, res) => addMember(req, res));
+app.put('/members', (req, res) => updateMember(req, res));
+app.delete('/members', (req, res) => deleteMember(req, res));
 
 function stripePayment(req, res) {
   (async () => {
@@ -180,11 +176,12 @@ function stripePayment(req, res) {
 }
 
 const newGameScore = (req, res) => {
-  const SQL = "SELECT name FROM group_members";
-  client.query(SQL).then(name => {
-    res.render("partials/newgame", { members: name.rows });
-  });
-};
+  const SQL = 'SELECT name FROM group_members WHERE group_id=$1';
+  const values = [jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id)]
+  return client.query(SQL, values).then( name => {
+    return {members: name.rows};
+  })
+ }
 
 const lookupGroup = handler => {
   const SQL = handler.query.groupname
@@ -278,7 +275,7 @@ const createGroup = (req, res) => {
   const handler = {
     query: req,
     cacheHit: result => {
-      res.send("Cache hit");
+      res.render('pages/index')
     },
     cacheMiss: result => {
       const hashedPassword = bcrypt.hashSync(req.password, 8);
@@ -330,7 +327,7 @@ const loginGroup = (req, res) => {
       }
     },
     cacheMiss: result => {
-      res.send("Cache miss");
+      res.render('pages/signup');
     }
   };
 
@@ -495,78 +492,64 @@ const renderDashboard = (req, res) => {
             return { id: member.id, name: member.name };
           });
           // CONVERT EACH games ENTRY INTO AN OBJECT WITH ONLY RELEVANT INFORMATION
-          games = games.map(game => {
-            return {
-              date: parseInt(game.date),
-              winning_team: game.winning_team,
-              losing_team: game.losing_team,
-              notes: game.notes
-            };
-          });
-          // STANDARDIZE EACH games ENTRY
-          games.forEach(game => {
-            // SORT winning_team and losing_team ARRAYS FOR FUTURE COMPARISON USE
-            game.winning_team = game.winning_team.sort((a, b) => a - b);
-            game.losing_team = game.losing_team.sort((a, b) => a - b);
-            // PUSH UNIQUE TEAM CONFIGURATIONS TO THE teams ARRAY
-            if (!teams.includes(game.winning_team)) {
-              teams.push(game.winning_team);
-            } else if (!teams.includes(game.losing_team)) {
-              teams.push(game.losing_team);
-            }
-          });
-          members.forEach(member => {
-            // CONVERT THE INTEGERS IN winning_team AND losing_team ARRAYS TO THEIR MEMBER NAME
-            games.forEach(game => {
-              game.winning_team = game.winning_team.map(player =>
-                player === member.id ? member.name : player
-              );
-              game.losing_team = game.losing_team.map(player =>
-                player === member.id ? member.name : player
-              );
-            });
-            // INSTANTIATE NEW memberLeaderboard ENTRY
-            let newEntry = new MemberStats(member);
-            // CALCULATE TOTAL WINS AND TOTAL LOSSES FOR NEW memberLeaderboard ENTRY
-            games.forEach(game => {
-              game.winning_team.includes(member.name)
+          games = games.map(game => { return { date: parseInt(game.date), winning_team: game.winning_team, losing_team: game.losing_team, notes: game.notes }});
+          
+          (function() {
+            const SQL = '(SELECT winning_team FROM games) UNION (SELECT losing_team FROM games)';
+            return client.query(SQL)
+              .then(results => results.rows.forEach(row => teams.push(row)));
+          })().then(() => {
+            teams = teams.map(entry => Object.values(entry)[0]);
+            members.forEach(member => {
+              // CONVERT THE INTEGERS IN winning_team AND losing_team ARRAYS TO THEIR MEMBER NAME
+              games.forEach(game => {
+                game.winning_team = game.winning_team.map(player => player === member.id ? member.name : player);
+                game.losing_team = game.losing_team.map(player => player === member.id ? member.name : player);
+              });
+              // INSTANTIATE NEW memberLeaderboard ENTRY
+              let newEntry = new MemberStats(member);
+              // CALCULATE TOTAL WINS AND TOTAL LOSSES FOR NEW memberLeaderboard ENTRY
+              games.forEach(game => {
+                game.winning_team.includes(member.name)
                 ? newEntry.addWin()
-                : game.losing_team.includes(member.name)
-                ? newEntry.addLoss()
-                : "";
+                : (game.losing_team.includes(member.name)
+                  ? newEntry.addLoss()
+                  : '');
+              })
+              // CALCULATE winPercentage FOR NEW memberLeaderboard ENTRY
+              newEntry.calcWinPercentage();
+              memberLeaderboard.push(newEntry);
             });
-            // CALCULATE winPercentage FOR NEW memberLeaderboard ENTRY
-            newEntry.calcWinPercentage();
-            memberLeaderboard.push(newEntry);
-          });
-          // CONVERT THE teams IDs TO member NAMES
-          members.forEach(member => {
-            teams.forEach((team, idx) => {
-              teams[idx] = team.map(player =>
-                player === member.id ? member.name : player
-              );
+            members.forEach(member => {
+              teams.forEach((team, idx) => {
+                if (!team.length) {
+                  teams.splice(idx, 1);
+                } else {
+                  teams[idx] = team.map(player => player === member.id ? member.name : player );
+                }
+              });
             });
-          });
-          teams.forEach(team => {
-            // INSTANTIATE NEW teamLeaderboard ENTRY
-            let newEntry = new TeamStats(team);
-            // CALCULATE TOTAL WINS AND LOSSES FOR NEW teamLederboard ENTRY
-            games.forEach(game => {
-              game.winning_team[0] === team[0] &&
-              game.winning_team[1] === team[1]
+            teams.forEach(team => {
+              // INSTANTIATE NEW teamLeaderboard ENTRY
+              let newEntry = new TeamStats(team);
+              // CALCULATE TOTAL WINS AND LOSSES FOR NEW teamLederboard ENTRY
+              games.forEach(game => {
+                game.winning_team[0] === team[0] && game.winning_team[1] === team[1]
                 ? newEntry.addWin()
-                : game.losing_team[0] === team[0] &&
-                  game.losing_team[1] === team[1]
-                ? newEntry.addLoss()
-                : "";
+                : (game.losing_team[0] === team[0] && game.losing_team[1] === team[1]
+                  ? newEntry.addLoss()
+                  : '');
+              })
+              // CALCULATE winPercentage FOR NEW teamLeaderboard ENTRY
+              newEntry.calcWinPercentage();
+              teamLeaderboard.push(newEntry);
             });
-            // CALCULATE winPercentage FOR NEW teamLeaderboard ENTRY
-            newEntry.calcWinPercentage();
-            teamLeaderboard.push(newEntry);
+            // RENDER THE dashboard PAGE AND PASS THE LEADERBOARDS TO IT
+            memberLeaderboard = memberLeaderboard.filter(member => member.wins + member.losses > 10);
+            teamLeaderboard = teamLeaderboard.filter(team => team.wins + team.losses > 10);
+            res.render('pages/dashboard', { memberLeaderboard, teamLeaderboard });
           });
-          // RENDER THE dashboard PAGE AND PASS THE LEADERBOARDS TO IT
-          res.render("pages/dashboard", { memberLeaderboard, teamLeaderboard });
-        });
+      });
     },
     cacheMiss: results => {
       res.redirect("/login");
@@ -575,5 +558,40 @@ const renderDashboard = (req, res) => {
 
   lookupGroup(handler);
 };
+
+const addGame = (req, res) => {
+  function Game(winningTeam, losingTeam, notes, groupID) {
+    this.date = Date.now(),
+    this.winningTeam = winningTeam,
+    this.losingTeam = losingTeam,
+    this.notes = notes,
+    this.groupID = groupID;
+  }
+
+  Game.prototype.save = function() {
+    const SQL = 'INSERT INTO games (date, winning_team, losing_team, notes, group_id) VALUES($1,$2,$3,$4,$5)';
+    const values = [this.date, this.winningTeam, this.losingTeam, this.notes, this.groupID];
+  
+    return client.query(SQL, values);
+  }
+
+  const groupID = jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id);
+  let winningTeam = [];
+  let losingTeam = [];
+  const SQL = 'SELECT * FROM group_members WHERE name=$1 OR name=$2 OR name=$3 OR name=$4';
+  const values = [req['winning-player1'], req['winning-player2'], req['losing-player1'], req['losing-player2']];
+  client.query(SQL, values)
+    .then(results => {
+      results.rows.forEach(row => {
+        if (row.name === req['winning-player1'] || row.name === req['winning-player2']) {
+          winningTeam.push(row.id);
+        } else {
+          losingTeam.push(row.id);
+        }
+      });
+      new Game(winningTeam, losingTeam, req.notes, groupID).save()
+        .then(() => res.redirect('/dashboard'));
+    });
+}
 
 app.listen(PORT, console.log(`App listening on ${PORT}.`));

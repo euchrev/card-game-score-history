@@ -1,12 +1,14 @@
+<h2>Team Leadboard</h2>
 <table id="teams-leaderboard">
   <thead>
     <tr>
       <th>MEMBERS</th>
-      <th>WIN TOTAL</th>
-      <th>LOSS TOTAL</th>
-      <th>WIN PERCENTAGE</th>
+      <th class="align-right">WIN TOTAL</th>
+      <th class="align-right">LOSS TOTAL</th>
+      <th class="align-right">WIN PERCENTAGE</th>
     </tr>
   </thead>
+  <% teamLeaderboard.sort((a, b) => b.winPercentage - a.winPercentage) %>
   <% teamLeaderboard.forEach(team => { %>
   <tr>
     <td class="table-name"><%= team.playerOne %>, <%= team.playerTwo  %> </td>
