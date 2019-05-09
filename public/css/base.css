@@ -243,7 +243,11 @@ table {
     visibility: hidden;
   }
   .half {
-    width: 80%;
+    width: 100%;
     padding: 10px;
+    box-sizing: border-box;
+  }
+  .settings-buttons {
+    width: 100px;
   }
 }
