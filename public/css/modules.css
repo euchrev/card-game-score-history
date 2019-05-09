@@ -1,12 +1,23 @@
 .dashboard-form {
   max-width: 1000px;
   margin: 40px auto 0 auto;
+}
+
+.dashboard-header ul {
+  display: flex;
+  justify-content: space-around;
+  list-style-type: none;
+}
+
+.dashboard-header ul li button {
+  cursor: pointer;
   color: #1c2260;
   background-color: #dfe3e8;
 }
 
 .dashboard-wrapper {
   margin: 0 auto;
+  width: 80%;
 }
 
 .dashboard-form {
@@ -26,6 +37,8 @@
 }
 
 table {
+  max-width: 80%;
+  /* margin: 0 auto; */
   width: 1000px;
   height: 600px;
   overflow-y: scroll;

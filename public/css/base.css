@@ -7,34 +7,90 @@ nav {
   margin: 0;
   padding: 0;
 }
-
-.img-fluid {
-  max-width: 100%;
-  height: auto;
-}
-
 body {
-  background-color: #dfe3e8;
+  /* background-color: #020000; */
   width: 100%;
   font-family: "Montserrat", sans-serif;
   margin: 0;
   padding: 0;
 }
+li {
+  list-style: none;
+}
+.white {
+  color: #fff;
+}
+h1 {
+  font-size: 42px;
+  line-height: 44px;
+  font-weight: 500;
+}
+h2 {
+  font-size: 28px;
+  line-height: 32px;
+  font-weight: 500;
+}
+.uppercase {
+  text-transform: uppercase;
+}
+
+.img-fluid {
+  max-width: 100%;
+  height: auto;
+}
+.diamond-icon {
+  width: 20px;
+}
+.cover-image-container2 {
+  background-color: #020000;
+  color: #fff;
+  float: left;
+  padding: 10px;
+}
+
 nav {
   margin: 0;
-  background-color: #1c2260;
+  background-color: #fff;
   width: 100%;
   color: #fff;
   height: auto;
+  padding: 10px;
   padding-left: 20px;
+  display: grid;
+  grid-template-rows: 1fr;
+  line-height: 40px;
+  align-items: center;
+}
+.nav-item {
+  grid-row: 1;
+  align-self: right;
+  line-height: 40px;
+  text-align: right;
+  padding-right: 20px;
 }
 .brand {
-  line-height: 50px;
-  font-size: 24px;
+  max-width: 100px;
+  height: auto;
+  margin: 10px;
+}
+.brand-parent {
+  display: grid;
+  align-items: center;
+  justify-self: left;
+  grid-row: 1;
 }
 a {
   text-decoration: none;
   color: #212b36;
+}
+.half {
+  width: 50%;
+  float: left;
+  padding: 10px;
+}
+.cover-image-container {
+  width: 33%;
+  float: left;
 }
 .button-lg {
   width: 100%;
@@ -44,16 +100,41 @@ a {
   outline-style: none;
   font-size: 18px;
 }
-.blue {
-  background-color: #1c2260;
+.nav-button {
+  padding: 5px;
+  margin-right: 10px;
+}
+.dark-border {
+  border: 2px solid #020000;
+}
+.sign-up {
+  background-color: grey;
+}
+.lg {
+  width: 200px;
+}
+.dark {
+  background-color: #020000;
   color: #fff;
+}
+.cover {
+  text-align: center;
+  background-color: #fff;
+  padding: 25px;
+  overflow: hidden;
+}
+.bio a {
+  font-size: 24px;
+}
+li {
+  text-align: left;
 }
 /* color of text on new-game page */
 .green {
   color: green;
   text-align: center;
 }
-.red{
+.red {
   color: rgb(223, 138, 138);
   margin-bottom: 3px;
 }
@@ -63,7 +144,7 @@ a {
 }
 .blue-border {
   background-color: #fff !important;
-  border: 2px solid #1c2260;
+  border: 2px solid #020000;
 }
 
 table {
@@ -74,12 +155,17 @@ table {
 .bio {
   width: 200px;
   margin: 10px;
+  background-color: #fff;
+  padding: 15px;
 }
 .subheading {
   font-size: 13px;
   line-height: 20px;
   font-weight: 700;
   text-transform: uppercase;
+}
+.feature {
+  width: 33%;
 }
 .green-border {
   border: 2px solid green;
@@ -132,7 +218,22 @@ table {
     font-weight: 400;
   }
   .bio {
-    width: 300px;
+    width: 330px;
     margin: 10px;
+    background-color: #fff;
+  }
+  .feature {
+    width: 80%;
+    height: 200px;
+  }
+  .cover-image-container {
+    width: 100%;
+  }
+  .desktop {
+    visibility: hidden;
+  }
+  .half {
+    width: 80%;
+    padding: 10px;
   }
 }

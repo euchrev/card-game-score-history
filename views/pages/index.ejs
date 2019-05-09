@@ -1,18 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
-<%- include ../partials/head.ejs %>
+  <%- include ../partials/head.ejs %>
 
-<body>
-  <%- include ../partials/main-nav.ejs %>
-  <section class="flex-container">
-    <form class="flex-container" action="/login" method="POST">
-      <input name="groupname" type="text" placeholder="Group Name" />
-      <input name="password" type="password" placeholder="Password" />
-      <button type="submit" class="button-lg blue">
-        Sign In
-      </button>
-      <a href="/signup" class="button-lg blue-border text-center">Sign Up</a>
-    </form>
+  <body>
+    <%- include ../partials/main-nav.ejs %>
+    
+    <section class="cover">
+      <div class ="cover-image-container">
+          <img src="./img/euchrev.png" class="img-fluid" />
+      </div>
+      <div class ="cover-image-container2 ">
+              <h2 class="uppercase text-center">
+                  A score keeping app for your group's euchre games.
+                </h2>
+    </div>
   </section>
-</body>
+      <section class="cover"> 
+        <hr />
+        <h2>Features </h2>
+        <hr />
+        <div class ="flex-container">
+          <div class ="feature"><img src="./img/diamond.png" class="diamond-icon"><h2 class="uppercase">Unlimited Group Members</h2><p>Easily add as many friends as you like to your group on one shared account. </p></div>
+          <div class ="feature"><img src="./img/diamond.png" class="diamond-icon"><h2 class="uppercase">Top Score Leaderboard & Team Statistics</h2><p>"Back up your bragging" All of group's team's scores & statistics are displayed on your group's dashboard.</p></div>
+          <div class ="feature"><img src="./img/diamond.png" class="diamond-icon"><h2 class="uppercase">Single Player Stats</h2><p>Easily access your group members individual stats.</p>
+          </div>
+          </section>
+    
+    
+    </section>
+    <section class="flex-container sign-up">
+      <form class="flex-container" action="/login" method="POST">
+        <h2>Have fun!</h2>
+        <input name="groupname" type="text" placeholder="Group Name" />
+        <input name="password" type="password" placeholder="Password" />
+        <button type="submit" class="button-lg dark">
+          Sign In
+        </button>
+        <a href="/signup" class="button-lg dark-border text-center">Sign Up</a>
+      </form>
+    </section>
+  </body>
 </html>
