@@ -58,13 +58,11 @@ a {
 .game-score-header {
   position: relative;
   top: -15%;
-
 }
 .blue-border {
   background-color: #fff !important;
   border: 2px solid #1c2260;
 }
-<<<<<<< Updated upstream
 .bio {
   width: 200px;
   margin: 10px;
@@ -74,7 +72,7 @@ a {
   line-height: 20px;
   font-weight: 700;
   text-transform: uppercase;
-=======
+}
 .green-border {
   border: 2px solid green;
   margin-bottom: 5px;
@@ -82,8 +80,6 @@ a {
 .red-border {
   border: 2px solid rgb(223, 138, 138);
   margin-bottom: 5px;
-
->>>>>>> Stashed changes
 }
 @media only screen and (max-width: 767px) {
   h1 {
