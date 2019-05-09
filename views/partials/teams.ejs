@@ -9,10 +9,10 @@
   </thead>
   <% teamLeaderboard.forEach(team => { %>
   <tr>
-    <td class="table-name"><%= team.members %></td>
+    <td class="table-name"><%= team.playerOne %>, <%= team.playerTwo  %> </td>
     <td><%= team.wins %></td>
     <td><%= team.losses %></td>
-    <td><%= team.winPercentage %></td>
+    <td><%= Math.floor(team.winPercentage * 100) %> %</td>
   </tr>
   <% }) %>
 </table>

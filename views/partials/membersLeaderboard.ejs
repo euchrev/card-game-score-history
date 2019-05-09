@@ -1,4 +1,3 @@
-
 <table class="dashboard-table" id="members-leaderboard">
   <thead>
     <tr>
@@ -17,4 +16,10 @@
     <td><%= Math.floor(member.winPercentage * 100) %> %</td>
   </tr>
   <% }) %>
+  <tfoot>
+    <tr>
+      <th><a href="pages/settings.ejs">ADD NEW MEMBER</a></th>
+
+    </tr>
+  </tfoot>
 </table>
