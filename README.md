@@ -2,14 +2,14 @@
 
 **Authors:** Rory Letteney, Austin Jess, Floyd Orr, Michele Saba
 
-**Version:** 0.25.4
-
+**Version:** 0.27.1
 
 ## Overview
 
 ## Architecture
 
 ## Change log
+- 05-09-2019 *4:00pm* - Rory-specific information now in the team's "about us" page.
 - 05-09-2019 *2:44pm* - Users can now enter new games into the database from the front-end. Login information now being sent via POST instead of GET. Group leaderboards entries now must meet threshold of 10 games in order to be rendered on the page.
 - 05-09-2019 *1:54* - Both team and members leaderboards are now sorted by highest win percentage.
 - 05-09-2019 *11:38* - Dashboard views now render to page correctly when clicked.
