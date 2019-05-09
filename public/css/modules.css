@@ -26,10 +26,11 @@
 }
 
 table {
-  width: 1000px;
+  width: 100%;
+  max-width: 1000px;
   height: 600px;
   overflow-y: scroll;
-  margin: 0 auto;
+  margin: 0 auto 80px auto;
   display: block;
 }
 
@@ -62,4 +63,13 @@ table tfoot th a {
 
 tfoot {
   text-align: left;
+}
+
+::-webkit-scrollbar {
+  background-color: #fff;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #1c2260;
 }
