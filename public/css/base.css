@@ -73,8 +73,8 @@ a {
   color: #212b36;
 }
 .half {
-  width: 50%; 
-  float: left; 
+  width: 50%;
+  float: left;
 }
 .button-lg {
   width: 100%;
@@ -87,12 +87,12 @@ a {
 .red-button {
   border: 2px solid #fa0404;
   padding: 5px;
-  color: #020000
+  color: #020000;
   margin-right: 10px;
-  border-radius: 5px; 
+  border-radius: 5px;
 }
 .lg {
-  width: 200px; 
+  width: 200px;
 }
 .dark {
   background-color: #020000;
@@ -104,7 +104,20 @@ a {
   padding: 25px;
   overflow: hidden;
 }
-.dark-border {
+/* color of text on new-game page */
+.green {
+  color: green;
+  text-align: center;
+}
+.red {
+  color: rgb(223, 138, 138);
+  margin-bottom: 3px;
+}
+.game-score-header {
+  position: relative;
+  top: -15%;
+}
+.blue-border {
   background-color: #fff !important;
   border: 2px solid #020000;
 }
@@ -123,6 +136,14 @@ a {
 }
 .feature {
   width: 33%;
+}
+.green-border {
+  border: 2px solid green;
+  margin-bottom: 5px;
+}
+.red-border {
+  border: 2px solid rgb(223, 138, 138);
+  margin-bottom: 5px;
 }
 @media only screen and (max-width: 767px) {
   h1 {

@@ -10,10 +10,10 @@ CREATE TABLE groups (
 );
 
 CREATE TABLE group_members (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(255),
-  group_id INTEGER NOT NULL,
-  FOREIGN KEY (group_id) REFERENCES groups (id)
+id SERIAL PRIMARY KEY,
+name VARCHAR(255),
+group_id INTEGER NOT NULL,
+FOREIGN KEY (group_id) REFERENCES groups (id)
 );
 
 CREATE TABLE games (
