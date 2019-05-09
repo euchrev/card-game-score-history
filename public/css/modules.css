@@ -3,15 +3,17 @@
   margin: 40px auto 0 auto;
 }
 
-.dashboard-header ul {
+/* .dashboard-header ul {
   display: flex;
   justify-content: space-around;
   list-style-type: none;
-}
+} */
+
+
 
 .dashboard-header ul li button {
   cursor: pointer;
-  color: #1c2260;
+  color: #000;
   background-color: #dfe3e8;
 }
 
@@ -47,7 +49,7 @@ table {
 }
 
 thead {
-  border-bottom: 2px solid #1c2260;
+  border-bottom: 2px solid #000;
 }
 
 table th {
@@ -62,11 +64,11 @@ table th {
 table td {
   padding: 20px 20px;
   text-align: right;
-  border-bottom: 1px solid #1c2260;
+  border-bottom: 1px solid #000;
 }
 
 table tfoot th a {
-  background: #1c2260;
+  background: #000;
   color: #fff;
   font-size: 0.9rem;
   padding: 10px 20px;
@@ -83,7 +85,7 @@ tfoot {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #1c2260;
+  background-color: #000;
 }
 
 /***********STRIPE*************/
