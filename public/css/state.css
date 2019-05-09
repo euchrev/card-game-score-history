@@ -1,11 +1,6 @@
 .dashboard-form input[type="radio"] {
   display: none;
 }
-
-/* .dashboard-form #team-radio {
-  display: block;
-} */
-
 .dashboard-form label {
   position: relative;
   display: inline-block;
@@ -24,7 +19,8 @@
   position: absolute;
   display: none;
   top: 30%;
-  left: 13%;
+  width: 80%;
+  left: 10%;
 }
 
 .dashboard-form input[type="radio"]:checked + .dashboard-wrapper {

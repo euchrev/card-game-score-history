@@ -1,10 +1,10 @@
-const pg = require('pg');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const cookieParser = require('cookie-parser');
-require('dotenv').config();
-const express = require('express');
-const methodOverride = require('method-override');
+const pg = require("pg");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const cookieParser = require("cookie-parser");
+require("dotenv").config();
+const express = require("express");
+const methodOverride = require("method-override");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,22 +12,22 @@ const DATABASE_URL = process.env.DATABASE_URL;
 const SECURE_KEY = process.env.SECURE_KEY;
 const GoogleSpreadsheet = require("google-spreadsheet");
 const creds = {
-  "type": process.env.TYPE,
-  "project_id": process.env.PROJECT_ID,
-  "private_key_id": process.env.PRIVATE_KEY_ID,
-  "private_key": process.env.PRIVATE_KEY,
-  "client_email": process.env.CLIENT_EMAIL,
-  "client_id": process.env.CLIENT_ID,
-  "auth_uri": process.env.AUTH_URI,
-  "token_uri": process.env.TOKEN_URI,
-  "auth_provider_x509_cert_url": process.env.AUTH_PROVIDER_X509_CERT_URL,
-  "client_x509_cert_url": process.env.CLIENT_X509_CERT_URL
+  type: process.env.TYPE,
+  project_id: process.env.PROJECT_ID,
+  private_key_id: process.env.PRIVATE_KEY_ID,
+  private_key: process.env.PRIVATE_KEY,
+  client_email: process.env.CLIENT_EMAIL,
+  client_id: process.env.CLIENT_ID,
+  auth_uri: process.env.AUTH_URI,
+  token_uri: process.env.TOKEN_URI,
+  auth_provider_x509_cert_url: process.env.AUTH_PROVIDER_X509_CERT_URL,
+  client_x509_cert_url: process.env.CLIENT_X509_CERT_URL
 };
 const async = require("async");
 const STRIPE_SECRET_KEY_TEST = process.env.STRIPE_SECRET_KEY_TEST;
-const stripe = require('stripe')(STRIPE_SECRET_KEY_TEST);
+const stripe = require("stripe")(STRIPE_SECRET_KEY_TEST);
 
-app.set('view engine', 'ejs');
+app.set("view engine", "ejs");
 
 app.use(
   express.urlencoded({
@@ -35,13 +35,13 @@ app.use(
   })
 );
 
-app.use(express.static('./public'));
+app.use(express.static("./public"));
 
 app.use(cookieParser());
-app.use(methodOverride('_method'));
+app.use(methodOverride("_method"));
 const client = new pg.Client(DATABASE_URL);
 client.connect();
-client.on("err", err => console.log(err));
+client.on("err", err => console.error(err));
 
 const doc = new GoogleSpreadsheet(
   "10PIDgiRsDs7JxNNYZBknTV8y78gCBt20-DPifqLCgJc"
@@ -53,7 +53,6 @@ const doc = new GoogleSpreadsheet(
 
 //       doc.useServiceAccountAuth(creds, step);
 //     },
-
 
 //     function getInfoAndWorksheets(step) {
 //       doc.getInfo(function(err, info) {
@@ -137,7 +136,6 @@ const doc = new GoogleSpreadsheet(
 //   }
 // );
 
-
 app.get('/', (req, res) => res.render('pages/index'));
 app.get('/signup', (req, res) => res.render('pages/signup'));
 app.get('/about', (req, res) => res.render('pages/about'));
@@ -151,7 +149,6 @@ app.post('/groups', (req, res) => createGroup(req.body, res));
 app.post('/members', (req, res) => addMember(req, res));
 app.put('/members', (req, res) => updateMember(req, res));
 app.delete('/members', (req, res) => deleteMember(req, res));
-
 
 function stripePayment(req, res) {
   try {
@@ -177,7 +174,6 @@ function stripePayment(req, res) {
   }catch(error){
     console.log(error);
   }
-  
 }
 
 const newGameScore = (req, res) => {
@@ -196,13 +192,13 @@ const newGameScore = (req, res) => {
 const lookupGroup = handler => {
   try {
     const SQL = handler.query.groupname ? 'SELECT * FROM groups WHERE name=$1' : 'SELECT * FROM groups WHERE id=$1';
-  const values = [handler.query.groupname ? handler.query.groupname : handler.query];
-  return client
-    .query(SQL, values)
-    .then(results =>
-      !results.rows.length
-      ? handler.cacheMiss(results)
-      : handler.cacheHit(results)
+    const values = [handler.query.groupname ? handler.query.groupname : handler.query];
+    return client
+      .query(SQL, values)
+      .then(results =>
+        !results.rows.length
+          ? handler.cacheMiss(results)
+          : handler.cacheHit(results)
     );
 
   }catch(error) {
@@ -220,8 +216,8 @@ const lookupMember = handler => {
       .query(SQL, values)
       .then(results =>
       !results.rows.length
-      ? handler.cacheMiss(results)
-      : handler.cacheHit(results)
+        ? handler.cacheMiss(results)
+        : handler.cacheHit(results)
     );
 
   } catch(error){
@@ -259,9 +255,9 @@ function Group(info) {
   typeof info.password  === 'string' ? '': console.log('Group object type error')
   typeof info.email  === 'string' ? '' : console.log('Group object type error')
   (this.name = info.groupname),
-  (this.email = info.email),
-  (this.password = info.password),
-  (this.paid = false);
+    (this.email = info.email),
+    (this.password = info.password),
+    (this.paid = false);
 }
 
 function Member(info) {
@@ -420,12 +416,11 @@ const updateGroup = (req, res) => {
         console.log('Group doesn\'t exist');
       }
     }
-
   }catch (error){
     console.log(error)
   }
   lookupGroup(handler);
-}
+};
 
 const addMember = (req, res) => {
   try {
@@ -437,17 +432,18 @@ const addMember = (req, res) => {
       groupID
     },
     cacheHit: result => {
-      console.log('Member exists');
+      console.log("Member exists");
     },
     cacheMiss: result => {
       const newMember = new Member({
         name,
         groupID
       });
-      newMember.save()
-        .then(result => req.body ? res.redirect('/members') : '');
+      newMember
+        .save()
+        .then(result => (req.body ? res.redirect("/members") : ""));
     }
-  }
+  };
 
   lookupMember(handler);
 
@@ -471,14 +467,13 @@ const updateMember = (req, res) => {
         newName: name,
         currentName,
         groupID
-      }
-      Member.update(memberInfo)
-        .then(result => res.redirect('/members'));
+      };
+      Member.update(memberInfo).then(result => res.redirect("/members"));
     },
     cacheMiss: result => {
-      console.log('Member does not exist');
+      console.log("Member does not exist");
     }
-  }
+  };
 
   lookupMember(handler);
 
@@ -498,13 +493,12 @@ const deleteMember = (req, res) => {
       name
     },
     cacheHit: result => {
-      Member.delete(handler.query)
-        .then(result => res.redirect('/members'));
+      Member.delete(handler.query).then(result => res.redirect("/members"));
     },
     cacheMiss: result => {
-      console.log('Member does not exist');
+      console.log("Member does not exist");
     }
-  }
+  };
 
   lookupMember(handler);
 
@@ -530,37 +524,37 @@ const renderDashboard = (req, res) => {
 
       // CONSTRUCTOR FOR EACH memberLeaderboard ENTRY
       function MemberStats(info) {
-        this.name = info.name,
-        this.wins = 0,
-        this.losses = 0,
-        this.winPercentage = 0
-        this.addWin = function() {
+        (this.name = info.name),
+          (this.wins = 0),
+          (this.losses = 0),
+          (this.winPercentage = 0);
+        (this.addWin = function() {
           this.wins++;
-        },
-        this.addLoss = function() {
-          this.losses++;
-        },
-        this.calcWinPercentage = function() {
-          this.winPercentage = this.wins / (this.wins + this.losses);
-        };
+        }),
+          (this.addLoss = function() {
+            this.losses++;
+          }),
+          (this.calcWinPercentage = function() {
+            this.winPercentage = this.wins / (this.wins + this.losses);
+          });
       }
 
       // CONSTRUCTOR FOR EACH teamLeaderboard ENTRY
       function TeamStats(info) {
-        this.playerOne = info[0],
-        this.playerTwo = info[1],
-        this.wins = 0,
-        this.losses = 0,
-        this.winPercentage = 0
-        this.addWin = function() {
+        (this.playerOne = info[0]),
+          (this.playerTwo = info[1]),
+          (this.wins = 0),
+          (this.losses = 0),
+          (this.winPercentage = 0);
+        (this.addWin = function() {
           this.wins++;
-        },
-        this.addLoss = function() {
-          this.losses++;
-        },
-        this.calcWinPercentage = function() {
-          this.winPercentage = this.wins / (this.wins + this.losses);
-        };
+        }),
+          (this.addLoss = function() {
+            this.losses++;
+          }),
+          (this.calcWinPercentage = function() {
+            this.winPercentage = this.wins / (this.wins + this.losses);
+          });
       }
 
       // GATHER LIST OF MEMBERS FROM DATABASE
@@ -573,7 +567,9 @@ const renderDashboard = (req, res) => {
         .then(results => {
           games = results.rows;
           // CONVERT EACH members ENTRY INTO AN OBJECT WITH ONLY RELEVANT INFORMATION
-          members = members.map(member => { return { id: member.id, name: member.name } });
+          members = members.map(member => {
+            return { id: member.id, name: member.name };
+          });
           // CONVERT EACH games ENTRY INTO AN OBJECT WITH ONLY RELEVANT INFORMATION
           games = games.map(game => { return { date: parseInt(game.date), winning_team: game.winning_team, losing_team: game.losing_team, notes: game.notes }});
           
@@ -635,9 +631,9 @@ const renderDashboard = (req, res) => {
       });
     },
     cacheMiss: results => {
-      res.redirect('/login');
+      res.redirect("/login");
     }
-  }
+  };
 
   lookupGroup(handler);
 
