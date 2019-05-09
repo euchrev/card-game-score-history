@@ -58,7 +58,7 @@ const doc = new GoogleSpreadsheet(
 //     function getInfoAndWorksheets(step) {
 //       doc.getInfo(function(err, info) {
 //         sheet = info.worksheets[0];
-        
+
 //         sheet.getRows(
 //           {
 //             offset: 1,
@@ -79,7 +79,7 @@ const doc = new GoogleSpreadsheet(
 //             Game.prototype.save = function() {
 //               const SQL = 'INSERT INTO games (date, winning_team, losing_team, notes, group_id) VALUES($1,$2,$3,$4,$5)';
 //               const values = [this.date, this.winningTeam, this.losingTeam, this.notes, this.groupID];
-            
+
 //               // client.query(SQL, values);
 //             }
 
@@ -152,6 +152,7 @@ app.post('/groups', (req, res) => createGroup(req.body, res));
 app.post('/members', (req, res) => addMember(req, res));
 app.put('/members', (req, res) => updateMember(req, res));
 app.delete('/members', (req, res) => deleteMember(req, res));
+
 
 function stripePayment(req, res) {
   (async () => {
