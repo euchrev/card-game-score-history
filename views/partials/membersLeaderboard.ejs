@@ -1,3 +1,4 @@
+<h2>Individual Leaderboard</h2>
 <table class="dashboard-table" id="members-leaderboard">
   <thead>
     <tr>
@@ -7,8 +8,8 @@
       <th>WIN PERCENTAGE</th>
     </tr>
   </thead>
-
-  <% memberLeaderboard.forEach(member => { %>
+  <% memberLeaderboard.sort((a, b) => b.winPercentage - a.winPercentage) %> <%
+  memberLeaderboard.forEach(member => { %>
   <tr>
     <td class="table-name"><%= member.name %></td>
     <td><%= member.wins %></td>
@@ -19,7 +20,6 @@
   <tfoot>
     <tr>
       <th><a href="pages/settings.ejs">ADD NEW MEMBER</a></th>
-
     </tr>
   </tfoot>
 </table>
