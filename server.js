@@ -524,6 +524,8 @@ const renderDashboard = (req, res) => {
               teamLeaderboard.push(newEntry);
             });
             // RENDER THE dashboard PAGE AND PASS THE LEADERBOARDS TO IT
+            memberLeaderboard = memberLeaderboard.filter(member => member.wins + member.losses > 10);
+            teamLeaderboard = teamLeaderboard.filter(team => team.wins + team.losses > 10);
             res.render('pages/dashboard', { memberLeaderboard, teamLeaderboard });
           });
       });
