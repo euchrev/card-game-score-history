@@ -9,13 +9,7 @@
   list-style-type: none;
 } */
 
-@media (max-width: 768px) {
-  .dashboard-form label {
-    width: 40px;
-    font-size: 0.4rem;
-    padding: 0;
-  }
-}
+
 
 .dashboard-header ul li button {
   cursor: pointer;
