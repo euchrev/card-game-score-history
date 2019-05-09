@@ -42,55 +42,99 @@ app.use(methodOverride('_method'));
 const client = new pg.Client(DATABASE_URL);
 client.connect();
 client.on("err", err => console.log(err));
+
 const doc = new GoogleSpreadsheet(
   "10PIDgiRsDs7JxNNYZBknTV8y78gCBt20-DPifqLCgJc"
 );
 
-async.series(
-  [
-    function setAuth(step) {
+// async.series(
+//   [
+//     function setAuth(step) {
 
-      doc.useServiceAccountAuth(creds, step);
-    },
+//       doc.useServiceAccountAuth(creds, step);
+//     },
 
-    function getInfoAndWorksheets(step) {
-      doc.getInfo(function(err, info) {
-        sheet = info.worksheets[0];
+//     function getInfoAndWorksheets(step) {
+//       doc.getInfo(function(err, info) {
+//         sheet = info.worksheets[0];
         
-        sheet.getRows(
-          {
-            offset: 1,
-            limit: 20,
-            orderby: "col2"
-          },
-          function(err, rows) {
-            let names =[];
-           
-            rows.forEach((item, i)=> {
-              //makes sure no duplicate names are in array
-              names.push(item.team1player1)
-              names.push(item.team1player2)
-              names.push(item.team2player1)
-              names.push(item.team1player2)
-            })
-            let uniqueArray = names.filter( (item, pos, self)=> {
-              return self.indexOf(item) == pos;
+//         sheet.getRows(
+//           {
+//             offset: 1,
+//             orderby: "col2"
+//           },
+//           function(err, rows) {
+//             // rows.forEach(row => row.individuals ? addMember({ name: row.individuals, groupID: 1 }) : '');
+//             // client.query("INSERT INTO group_members (name, group_id) VALUES('Anna', 1)");
 
-            })
-              // put stuff in Postresql here
+//             function Game(date, winningTeam, losingTeam, notes, groupID) {
+//               this.date = date,
+//               this.winningTeam = winningTeam || [],
+//               this.losingTeam = losingTeam || [],
+//               this.notes = notes,
+//               this.groupID = groupID;
+//             }
 
-          }
-        );
-        step();
-      });
-    }
-  ],
-  function(err) {
-    if (err) {
-      console.log("ERROR:" + err);
-    }
-  }
-);
+//             Game.prototype.save = function() {
+//               const SQL = 'INSERT INTO games (date, winning_team, losing_team, notes, group_id) VALUES($1,$2,$3,$4,$5)';
+//               const values = [this.date, this.winningTeam, this.losingTeam, this.notes, this.groupID];
+            
+//               // client.query(SQL, values);
+//             }
+
+//             let teamNames = [];
+//             let memberIDs = [];
+//             let teams = [];
+//             let dates = [];
+//             let notes = [];
+//             let winningTeams = [];
+//             let losingTeams = [];
+//             rows.forEach(row => {
+//               row.teamwinloss ? teams.push({ team: row.teamwinloss, teammember1: row.teammember1, teammember2: row.teammember2 }) : '';
+//               row.teamwinloss ? teamNames.push(row.teamwinloss) : '';
+//             })
+
+//             client.query(`SELECT id, name FROM group_members WHERE group_id=1`)
+//               .then(result => result.rows.forEach(row => memberIDs.push({ name: row.name, id: row.id })))
+//               .then(result => {
+//                 teams = teams.map(team => {
+//                   for (let i = 0; i < memberIDs.length; i++) {
+//                     if (team.teammember1 === memberIDs[i].name) {
+//                       team.teammember1 = memberIDs[i].id;
+//                     }
+//                     if (team.teammember2 === memberIDs[i].name) {
+//                       team.teammember2 = memberIDs[i].id;
+//                     }
+//                   }
+//                   return team;
+//                 })
+
+//                 rows.forEach(row => {
+//                   for (let i = 0; i < teams.length; i++) {
+//                     row.winningteam === teams[i].team ? winningTeams.push([teams[i].teammember1, teams[i].teammember2]) : '';
+//                     row.losingteam === teams[i].team ? losingTeams.push([teams[i].teammember1, teams[i].teammember2]) : '';
+//                   }
+//                   teamNames.includes(row.winningteam) ? dates.push(row.date) : '';
+//                   teamNames.includes(row.winningteam) ? notes.push(row.notes) : '';
+//                 })
+//                 dates = dates.map(date => date.split('/').map(piece => piece.split('').length > 1 ? piece : `0${piece}`).join('/')).map(date => new Date(date).getTime());
+
+//                 dates.forEach((date, idx) => {
+//                  // new Game(date, winningTeams[idx], losingTeams[idx], notes[idx], 1).save();
+//                 })
+//               });
+//           }
+//         );
+//         step();
+//       });
+//     }
+//   ],
+//   function(err) {
+//     if (err) {
+//       console.log("ERROR:" + err);
+//     }
+//   }
+// );
 
 
 app.get('/', (req, res) => res.render('pages/index'));
@@ -147,7 +191,7 @@ const lookupGroup = handler => {
 
 const lookupMember = handler => {
   const SQL = 'SELECT * FROM group_members WHERE name=$1 AND group_id=$2';
-  const values = [`${handler.query.firstname} ${handler.query.lastname}`, handler.query.groupID];
+  const values = [handler.query.name, handler.query.groupID];
   return client
     .query(SQL, values)
     .then(results =>
@@ -177,7 +221,7 @@ function Group(info) {
 }
 
 function Member(info) {
-  (this.name = info.groupname),
+  (this.name = info.name),
   (this.groupID = info.groupID);
 }
 
@@ -294,13 +338,11 @@ const updateGroup = (req, res) => {
 }
 
 const addMember = (req, res) => {
-  const groupID = jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id);
-  const firstname = req.body.firstname;
-  const lastname = req.body.lastname;
+  const groupID = req.body ? jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id) : req.groupID;
+  const name = req.body ? req.body.name : req.name;
   const handler = {
     query: {
-      firstname,
-      lastname,
+      name,
       groupID
     },
     cacheHit: result => {
@@ -308,11 +350,11 @@ const addMember = (req, res) => {
     },
     cacheMiss: result => {
       const newMember = new Member({
-        name: `${req.body.firstname} ${req.body.lastname}`,
+        name,
         groupID
       });
       newMember.save()
-        .then(result => res.redirect('/members'));
+        .then(result => req.body ? res.redirect('/members') : '');
     }
   }
 
@@ -321,18 +363,16 @@ const addMember = (req, res) => {
 
 const updateMember = (req, res) => {
   const groupID = jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id);
-  const firstname = req.body.firstname;
-  const lastname = req.body.lastname;
+  const name = req.body.name;
   const currentName = req.body.currentname;
   const handler = {
     query: {
-      firstname,
-      lastname,
+      name,
       groupID
     },
     cacheHit: result => {
       const memberInfo = {
-        newName: `${firstname} ${lastname}`,
+        newName: name,
         currentName,
         groupID
       }
@@ -349,7 +389,7 @@ const updateMember = (req, res) => {
 
 const deleteMember = (req, res) => {
   const groupID = jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id);
-  const name = `${req.body.firstname} ${req.body.lastname}`;
+  const name = req.body.name;
   const handler = {
     query: {
       groupID,
