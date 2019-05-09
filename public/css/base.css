@@ -46,6 +46,19 @@ a {
   background-color: #1c2260;
   color: #fff;
 }
+/* color of text on new-game page */
+.green {
+  color: green;
+  text-align: center;
+}
+.red{
+  color: rgb(223, 138, 138);
+  margin-bottom: 3px;
+}
+.game-score-header {
+  position: relative;
+  top: -15%;
+}
 .blue-border {
   background-color: #fff !important;
   border: 2px solid #1c2260;
@@ -59,6 +72,14 @@ a {
   line-height: 20px;
   font-weight: 700;
   text-transform: uppercase;
+}
+.green-border {
+  border: 2px solid green;
+  margin-bottom: 5px;
+}
+.red-border {
+  border: 2px solid rgb(223, 138, 138);
+  margin-bottom: 5px;
 }
 @media only screen and (max-width: 767px) {
   h1 {

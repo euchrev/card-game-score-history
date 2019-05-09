@@ -54,6 +54,7 @@ const doc = new GoogleSpreadsheet(
 //       doc.useServiceAccountAuth(creds, step);
 //     },
 
+
 //     function getInfoAndWorksheets(step) {
 //       doc.getInfo(function(err, info) {
 //         sheet = info.worksheets[0];
@@ -144,16 +145,12 @@ app.get('/about', (req, res) => res.render('pages/about'));
 app.get('/dashboard', (req, res) => renderDashboard(req, res));
 app.get('/groups', (req, res) => loginGroup(req.query, res));
 app.get('/payment', (req, res) => stripePayment(req, res));
-app.get(
-  '/logout',
-  (req, res) => res.clearCookie('auth') && res.redirect('/login')
-);
-
+app.get( '/logout', (req, res) => res.clearCookie('auth') && res.redirect('/login'));
+app.get('/new-game',(req, res) => newGameScore(req, res))
+app.get('/gamescore', (req, res) => newGameScore(req, res));
 app.post('/groups', (req, res) => createGroup(req.body, res));
 app.post('/members', (req, res) => addMember(req, res));
-
 app.put('/members', (req, res) => updateMember(req, res));
-
 app.delete('/members', (req, res) => deleteMember(req, res));
 
 function stripePayment(req, res) {
@@ -176,6 +173,13 @@ function stripePayment(req, res) {
     });    
   })();
 }
+
+const newGameScore = (req, res) => {
+  const SQL = 'SELECT name FROM group_members';
+   client.query(SQL).then( name => {
+    res.render('partials/newgame', {members: name.rows})
+  })
+ }
 
 const lookupGroup = handler => {
   const SQL = handler.query.groupname ? 'SELECT * FROM groups WHERE name=$1' : 'SELECT * FROM groups WHERE id=$1';

@@ -8,6 +8,7 @@
 ## Architecture
 
 ## Change log
+- 05-09-2019 *10:03pm* - '/new-game' route populates selector on newgame.ejs with names of players.
 - 05-08-2019 *9:16pm* - Now able to populate the games table and group_members table with data from the provided Google spreadsheet.
 - 05-08-2019 *4:24pm* - Dashboard now receiving all of the data it needs to render the leaderboards.
 - 05-08-2019 *9:26am* - Signup form is created and hookedup. Paid status is updated upon payment completion.
