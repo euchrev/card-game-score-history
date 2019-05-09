@@ -42,6 +42,7 @@ app.use(methodOverride('_method'));
 const client = new pg.Client(DATABASE_URL);
 client.connect();
 client.on("err", err => console.log(err));
+
 const doc = new GoogleSpreadsheet(
   "10PIDgiRsDs7JxNNYZBknTV8y78gCBt20-DPifqLCgJc"
 );
@@ -60,25 +61,11 @@ async.series(
         sheet.getRows(
           {
             offset: 1,
-            limit: 20,
             orderby: "col2"
           },
           function(err, rows) {
-            let names =[];
-           
-            rows.forEach((item, i)=> {
-              //makes sure no duplicate names are in array
-              names.push(item.team1player1)
-              names.push(item.team1player2)
-              names.push(item.team2player1)
-              names.push(item.team1player2)
-            })
-            let uniqueArray = names.filter( (item, pos, self)=> {
-              return self.indexOf(item) == pos;
-
-            })
-              // put stuff in Postresql here
-
+            rows.forEach(row => row.individuals ? addMember({ name: row.individuals, groupID: 1 }) : '');
+            
           }
         );
         step();
@@ -147,7 +134,7 @@ const lookupGroup = handler => {
 
 const lookupMember = handler => {
   const SQL = 'SELECT * FROM group_members WHERE name=$1 AND group_id=$2';
-  const values = [`${handler.query.firstname} ${handler.query.lastname}`, handler.query.groupID];
+  const values = [handler.query.name, handler.query.groupID];
   return client
     .query(SQL, values)
     .then(results =>
@@ -177,7 +164,7 @@ function Group(info) {
 }
 
 function Member(info) {
-  (this.name = info.groupname),
+  (this.name = info.name),
   (this.groupID = info.groupID);
 }
 
@@ -294,13 +281,11 @@ const updateGroup = (req, res) => {
 }
 
 const addMember = (req, res) => {
-  const groupID = jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id);
-  const firstname = req.body.firstname;
-  const lastname = req.body.lastname;
+  const groupID = req.body ? jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id) : req.groupID;
+  const name = req.body ? req.body.name : req.name;
   const handler = {
     query: {
-      firstname,
-      lastname,
+      name,
       groupID
     },
     cacheHit: result => {
@@ -308,11 +293,11 @@ const addMember = (req, res) => {
     },
     cacheMiss: result => {
       const newMember = new Member({
-        name: `${req.body.firstname} ${req.body.lastname}`,
+        name,
         groupID
       });
       newMember.save()
-        .then(result => res.redirect('/members'));
+        .then(result => req.body ? res.redirect('/members') : '');
     }
   }
 
@@ -321,18 +306,16 @@ const addMember = (req, res) => {
 
 const updateMember = (req, res) => {
   const groupID = jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id);
-  const firstname = req.body.firstname;
-  const lastname = req.body.lastname;
+  const name = req.body.name;
   const currentName = req.body.currentname;
   const handler = {
     query: {
-      firstname,
-      lastname,
+      name,
       groupID
     },
     cacheHit: result => {
       const memberInfo = {
-        newName: `${firstname} ${lastname}`,
+        newName: name,
         currentName,
         groupID
       }
@@ -349,7 +332,7 @@ const updateMember = (req, res) => {
 
 const deleteMember = (req, res) => {
   const groupID = jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id);
-  const name = `${req.body.firstname} ${req.body.lastname}`;
+  const name = req.body.name;
   const handler = {
     query: {
       groupID,
