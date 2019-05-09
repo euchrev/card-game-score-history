@@ -1,33 +1,33 @@
 
-    <form id="signup" class="flex-container" action="/****   " method="POST">
+    <form class="flex-container" action="/****" method="POST">
       <h2 class="green">Winning Team</h2>
 
-        <select class='green-border center-row'>
+        <select name="winning-player1" class='green-border center-row'>
            <% members.forEach(function(member){ %>
           <option value="<%= member.name %>"><%= member.name %></option>
           <% }); %>
          </select>
         
-         <select class='green-border center-row'>
+         <select name="winning-player2" class='green-border center-row'>
            <% members.forEach(function(member){ %>
             <option value="<%= member.name %>"><%= member.name %></option>
             <% }); %>
         </select>
 
         <h2 class="red">losing Team</h2>
-        <select class='red-border center-row'>
+        <select name="losing-player1" class='red-border center-row'>
           <% members.forEach(function(member){ %>
             <option value="<%= member.name %>"><%= member.name %></option>
             <% }); %>
 
         </select>
-        <select class='red-border center-row'>
+        <select name="losing-player2" class='red-border center-row'>
             <% members.forEach(function(member){ %>
               <option value="<%= member.name %>"><%= member.name %></option>
               <% }); %>
         </select>
 
-      <textarea rows="9" cols="65" placeholder='Notes'></textarea >
-      <a href="/" class="button-lg blue-border text-center">Submit</a>
+      <textarea name="notes" rows="9" cols="65" placeholder='Notes'></textarea >
+      <input type="submit" class="button-lg blue-border text-center">Submit</a>
     </form>
  
