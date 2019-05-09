@@ -153,6 +153,7 @@ app.post('/members', (req, res) => addMember(req, res));
 app.put('/members', (req, res) => updateMember(req, res));
 app.delete('/members', (req, res) => deleteMember(req, res));
 
+
 function stripePayment(req, res) {
   (async () => {
     const session = await stripe.checkout.sessions.create({
