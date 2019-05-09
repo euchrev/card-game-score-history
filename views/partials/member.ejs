@@ -1,10 +1,29 @@
-<li>
-  <p class="name">Rory Letteney</p>
-  <form class="hidden" id="member">
-    <input name="firstname" value="Rory" placeholder="First Name" required>
-    <input name="lastname" value="Letteney" placeholder="Last Name" required>
-    <input class="hidden" name="currentname" value="Rory Letteney" required>
-  </form>
-  <input type="submit" form="member" formaction="/members?_method=PUT" formmethod="POST" value="Update">
-  <input type="submit" form="member" formaction="/members?_method=DELETE" formmethod="POST" value="Delete">
-</li>
+  <li>
+    <form class="hidden" id="member">
+      <input name="firstname" value="Rory" placeholder="First Name" required />
+      <input
+        name="lastname"
+        value="Letteney"
+        placeholder="Last Name"
+        required
+      />
+      <input class="hidden" name="currentname" value="Rory Letteney" required />
+    </form>
+    <input
+      type="submit"
+      class="dark-border"
+      form="member"
+      formaction="/members?_method=PUT"
+      formmethod="POST"
+      value="Update"
+    />
+    <input
+      type="submit"
+      form="member"
+      class="dark-border"
+      formaction="/members?_method=DELETE"
+      formmethod="POST"
+      value="Delete"
+    />
+  </li>
+</html>

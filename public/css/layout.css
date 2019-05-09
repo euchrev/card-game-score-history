@@ -1,9 +1,9 @@
 form {
-  max-width: 400px;
+  /* max-width: 400px; */
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
-  justify-content: center;
+  /* justify-content: center; */
   background-color: #fff;
 }
 input {
@@ -18,7 +18,6 @@ input {
   width: 98%;
   height: 10%;
 }
-
 textarea {
   width: 96%;
   margin-top: 2%;
@@ -35,4 +34,12 @@ textarea {
 
 .text-center {
   text-align: center;
+}
+.row {
+  margin-right: -15px;
+  margin-left: -15px;
+  clear: both;
+}
+.left {
+  float: left;
 }

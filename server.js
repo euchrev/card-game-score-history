@@ -41,7 +41,7 @@ app.use(cookieParser());
 app.use(methodOverride("_method"));
 const client = new pg.Client(DATABASE_URL);
 client.connect();
-client.on("err", err => console.log(err));
+client.on("err", err => console.error(err));
 
 const doc = new GoogleSpreadsheet(
   "10PIDgiRsDs7JxNNYZBknTV8y78gCBt20-DPifqLCgJc"
@@ -53,7 +53,6 @@ const doc = new GoogleSpreadsheet(
 
 //       doc.useServiceAccountAuth(creds, step);
 //     },
-
 
 //     function getInfoAndWorksheets(step) {
 //       doc.getInfo(function(err, info) {
@@ -137,22 +136,23 @@ const doc = new GoogleSpreadsheet(
 //   }
 // );
 
-
-app.get('/', (req, res) => res.render('pages/index'));
-app.get('/login', (req, res) => res.render('pages/login'));
-app.get('/signup', (req, res) => res.render('pages/signup'));
-app.get('/about', (req, res) => res.render('pages/about'));
-app.get('/dashboard', (req, res) => renderDashboard(req, res));
-app.get('/groups', (req, res) => loginGroup(req.query, res));
-app.get('/payment', (req, res) => stripePayment(req, res));
-app.get( '/logout', (req, res) => res.clearCookie('auth') && res.redirect('/login'));
-app.get('/new-game',(req, res) => newGameScore(req, res))
-app.get('/gamescore', (req, res) => newGameScore(req, res));
-app.post('/groups', (req, res) => createGroup(req.body, res));
-app.post('/members', (req, res) => addMember(req, res));
-app.put('/members', (req, res) => updateMember(req, res));
-app.delete('/members', (req, res) => deleteMember(req, res));
-
+app.get("/", (req, res) => res.render("pages/index"));
+app.get("/login", (req, res) => res.render("pages/login"));
+app.get("/signup", (req, res) => res.render("pages/signup"));
+app.get("/about", (req, res) => res.render("pages/about"));
+app.get("/dashboard", (req, res) => renderDashboard(req, res));
+app.get("/groups", (req, res) => loginGroup(req.query, res));
+app.get("/payment", (req, res) => stripePayment(req, res));
+app.get(
+  "/logout",
+  (req, res) => res.clearCookie("auth") && res.redirect("/login")
+);
+app.get("/new-game", (req, res) => newGameScore(req, res));
+app.get("/gamescore", (req, res) => newGameScore(req, res));
+app.post("/groups", (req, res) => createGroup(req.body, res));
+app.post("/members", (req, res) => addMember(req, res));
+app.put("/members", (req, res) => updateMember(req, res));
+app.delete("/members", (req, res) => deleteMember(req, res));
 
 function stripePayment(req, res) {
   (async () => {
@@ -180,11 +180,11 @@ function stripePayment(req, res) {
 }
 
 const newGameScore = (req, res) => {
-  const SQL = 'SELECT name FROM group_members';
-   client.query(SQL).then( name => {
-    res.render('partials/newgame', {members: name.rows})
-  })
- }
+  const SQL = "SELECT name FROM group_members";
+  client.query(SQL).then(name => {
+    res.render("partials/newgame", { members: name.rows });
+  });
+};
 
 const lookupGroup = handler => {
   const SQL = handler.query.groupname

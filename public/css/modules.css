@@ -1,7 +1,6 @@
 .dashboard-form {
   max-width: 1000px;
   margin: 40px auto 0 auto;
-  
 }
 
 .dashboard-header ul {
@@ -16,7 +15,7 @@
 
 .dashboard-wrapper {
   margin: 0 auto;
-  max-width: 800px;
+  width: 80%;
 }
 
 .dashboard-form {
@@ -31,8 +30,8 @@
 }
 
 table {
-  max-width: 800px;
-  margin: 0 auto;
+  max-width: 80%;
+  /* margin: 0 auto; */
 }
 
 thead {
@@ -52,7 +51,7 @@ table td {
 table tfoot th a {
   background: #1c2260;
   color: #fff;
-  font-size: .9rem;
+  font-size: 0.9rem;
   padding: 10px 20px;
 }
 
