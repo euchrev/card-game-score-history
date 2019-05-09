@@ -10,6 +10,16 @@ nav {
   margin: 0;
   padding: 0;
 }
+
+main {
+  min-height: calc(100vh - 60.5px);
+}
+
+.img-fluid {
+  max-width: 100%;
+  height: auto;
+}
+
 body {
   /* background-color: #020000; */
   width: 100%;
@@ -261,7 +271,11 @@ table {
     visibility: hidden;
   }
   .half {
-    width: 80%;
+    width: 100%;
     padding: 10px;
+    box-sizing: border-box;
+  }
+  .settings-buttons {
+    width: 100px;
   }
 }
