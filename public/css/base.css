@@ -1,3 +1,6 @@
+html {
+  scroll-behavior: smooth;
+}
 body,
 p,
 h1,
@@ -115,6 +118,7 @@ a {
 }
 .dark {
   background-color: #020000;
+  border: none;
   color: #fff;
 }
 .cover {
@@ -175,6 +179,30 @@ table {
   border: 2px solid rgb(223, 138, 138);
   margin-bottom: 5px;
 }
+.stripe {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  grid-row-gap: 30px;
+  min-height: 100vh;
+}
+
+.stripe button {
+  height: 30px;
+  width: 150px;
+  font-size: 1.2em;
+  background-color: transparent;
+  border: 2px solid #222;
+  color: #222;
+  transition: all .3s ease;
+}
+
+.stripe button:hover {
+  transform: scale(1.2);
+  background-color: #222;
+  color: #fff;
+}
+
 @media only screen and (max-width: 767px) {
   h1 {
     font-size: 27px;
