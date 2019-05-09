@@ -139,11 +139,10 @@ const doc = new GoogleSpreadsheet(
 
 
 app.get('/', (req, res) => res.render('pages/index'));
-app.get('/login', (req, res) => res.render('pages/login'));
 app.get('/signup', (req, res) => res.render('pages/signup'));
 app.get('/about', (req, res) => res.render('pages/about'));
 app.get('/dashboard', (req, res) => renderDashboard(req, res));
-app.get('/groups', (req, res) => loginGroup(req.query, res));
+app.post('/login', (req, res) => loginGroup(req.body, res));
 app.get('/payment', (req, res) => stripePayment(req, res));
 app.get( '/logout', (req, res) => res.clearCookie('auth') && res.redirect('/login'));
 app.get('/new-game',(req, res) => newGameScore(req, res));
@@ -272,7 +271,7 @@ const createGroup = (req, res) => {
   const handler = {
     query: req,
     cacheHit: result => {
-      res.send('Cache hit');
+      res.render('pages/index')
     },
     cacheMiss: result => {
       const hashedPassword = bcrypt.hashSync(req.password, 8);
@@ -322,7 +321,7 @@ const loginGroup = (req, res) => {
       }
     },
     cacheMiss: result => {
-      res.send('Cache miss');
+      res.render('pages/signup');
     }
   };
 
