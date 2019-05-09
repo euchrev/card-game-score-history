@@ -416,10 +416,10 @@ const updateGroup = (req, res) => {
         console.log('Group doesn\'t exist');
       }
     }
+    lookupGroup(handler);
   }catch (error){
     console.log(error)
   }
-  lookupGroup(handler);
 };
 
 const addMember = (req, res) => {
