@@ -2,7 +2,7 @@
 
 **Authors:** Rory Letteney, Austin Jess, Floyd Orr, Michele Saba
 
-**Version:** 0.24.11
+**Version:** 0.25.4
 
 
 ## Overview
@@ -10,6 +10,7 @@
 ## Architecture
 
 ## Change log
+- 05-09-2019 *2:44pm* - Users can now enter new games into the database from the front-end. Login information now being sent via POST instead of GET. Group leaderboards entries now must meet threshold of 10 games in order to be rendered on the page.
 - 05-09-2019 *1:54* - Both team and members leaderboards are now sorted by highest win percentage.
 - 05-09-2019 *11:38* - Dashboard views now render to page correctly when clicked.
 - 05-09-2019 *10:03pm* - '/new-game' route populates selector on newgame.ejs with names of players.
