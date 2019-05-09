@@ -146,8 +146,8 @@ app.get('/dashboard', (req, res) => renderDashboard(req, res));
 app.get('/groups', (req, res) => loginGroup(req.query, res));
 app.get('/payment', (req, res) => stripePayment(req, res));
 app.get( '/logout', (req, res) => res.clearCookie('auth') && res.redirect('/login'));
-app.get('/new-game',(req, res) => newGameScore(req, res))
-app.get('/gamescore', (req, res) => newGameScore(req, res));
+app.get('/new-game',(req, res) => newGameScore(req, res));
+app.post('/games', (req, res) => addGame(req.body, res));
 app.post('/groups', (req, res) => createGroup(req.body, res));
 app.post('/members', (req, res) => addMember(req, res));
 app.put('/members', (req, res) => updateMember(req, res));
@@ -170,14 +170,15 @@ function stripePayment(req, res) {
     });
     res.render('pages/payment.ejs', {
       sessionId: session.id
-    });    
+    });
   })();
 }
 
 const newGameScore = (req, res) => {
-  const SQL = 'SELECT name FROM group_members';
-   client.query(SQL).then( name => {
-    res.render('partials/newgame', {members: name.rows})
+  const SQL = 'SELECT name FROM group_members WHERE group_id=$1';
+  const values = [jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id)]
+  return client.query(SQL, values).then( name => {
+    return {members: name.rows};
   })
  }
 
@@ -534,6 +535,41 @@ const renderDashboard = (req, res) => {
   }
 
   lookupGroup(handler);
+}
+
+const addGame = (req, res) => {
+  function Game(winningTeam, losingTeam, notes, groupID) {
+    this.date = Date.now(),
+    this.winningTeam = winningTeam,
+    this.losingTeam = losingTeam,
+    this.notes = notes,
+    this.groupID = groupID;
+  }
+
+  Game.prototype.save = function() {
+    const SQL = 'INSERT INTO games (date, winning_team, losing_team, notes, group_id) VALUES($1,$2,$3,$4,$5)';
+    const values = [this.date, this.winningTeam, this.losingTeam, this.notes, this.groupID];
+  
+    return client.query(SQL, values);
+  }
+
+  const groupID = jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id);
+  let winningTeam = [];
+  let losingTeam = [];
+  const SQL = 'SELECT * FROM group_members WHERE name=$1 OR name=$2 OR name=$3 OR name=$4';
+  const values = [req['winning-player1'], req['winning-player2'], req['losing-player1'], req['losing-player2']];
+  client.query(SQL, values)
+    .then(results => {
+      results.rows.forEach(row => {
+        if (row.name === req['winning-player1'] || row.name === req['winning-player2']) {
+          winningTeam.push(row.id);
+        } else {
+          losingTeam.push(row.id);
+        }
+      });
+      new Game(winningTeam, losingTeam, req.notes, groupID).save()
+        .then(() => res.redirect('/dashboard'));
+    });
 }
 
 app.listen(PORT, console.log(`App listening on ${PORT}.`));
