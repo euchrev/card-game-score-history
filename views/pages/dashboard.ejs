@@ -5,29 +5,32 @@
   <body>
     <%- include('../partials/main-nav.ejs') %>
     <main>
-      <form class="dashboard-form">
-        <label for="team-radio"
-          >TEAMS <img src="./img/users.svg" class="desktop "
-        /></label>
-        <input type="radio" name="dashboard-state" id="team-radio" checked />
-        <section class="dashboard-wrapper">
-          <%- include('../partials/teams.ejs', {teamLeaderboard}) %>
-        </section>
-        <label for="member-radio"
-          >MEMBERS <img src="./img/user.svg" class="desktop"
-        /></label>
-        <input type="radio" name="dashboard-state" id="member-radio" />
-        <section class="dashboard-wrapper">
-          <%- include('../partials/membersLeaderboard.ejs', {memberLeaderboard})
-          %>
-        </section>
-        <label for="settings-radio"
-          >SETTINGS<img src="./img/settings.svg" class="desktop"
-        /></label>
+      <section class="dash-nav">
 
-        <input type="radio" name="dashboard-state" id="settings-radio" />
-        <section class="dashboard-wrapper">
-          <%- include('../partials/settings.ejs') %>
+        <form class="dashboard-form">
+          <label for="team-radio"
+          >TEAMS <img src="./img/users.svg" class="desktop"
+          /></label>
+          <input type="radio" name="dashboard-state" id="team-radio" checked />
+          <section class="dashboard-wrapper">
+            <%- include('../partials/teams.ejs', {teamLeaderboard}) %>
+          </section>
+          <label for="member-radio"
+          >MEMBERS <img src="./img/user.svg" class="desktop"
+          /></label>
+          <input type="radio" name="dashboard-state" id="member-radio" />
+          <section class="dashboard-wrapper">
+            <%- include('../partials/membersLeaderboard.ejs', {memberLeaderboard})
+            %>
+          </section>
+          <label for="settings-radio"
+          >SETTINGS<img src="./img/settings.svg" class="desktop"
+          /></label>
+
+          <input type="radio" name="dashboard-state" id="settings-radio" />
+          <section class="dashboard-wrapper">
+            <%- include('../partials/settings.ejs') %>
+          </section>
         </section>
       </form>
     </main>
