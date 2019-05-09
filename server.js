@@ -65,15 +65,34 @@ async.series(
           },
           function(err, rows) {
             // rows.forEach(row => row.individuals ? addMember({ name: row.individuals, groupID: 1 }) : '');
+            // client.query("INSERT INTO group_members (name, group_id) VALUES('Anna', 1)");
+
+            function Game(date, winningTeam, losingTeam, notes, groupID) {
+              this.date = date,
+              this.winningTeam = winningTeam || [],
+              this.losingTeam = losingTeam || [],
+              this.notes = notes,
+              this.groupID = groupID;
+            }
+
+            Game.prototype.save = function() {
+              const SQL = 'INSERT INTO games (date, winning_team, losing_team, notes, group_id) VALUES($1,$2,$3,$4,$5)';
+              const values = [this.date, this.winningTeam, this.losingTeam, this.notes, this.groupID];
+            
+              // client.query(SQL, values);
+            }
+
+            let teamNames = [];
             let memberIDs = [];
             let teams = [];
             let dates = [];
+            let notes = [];
+            let winningTeams = [];
+            let losingTeams = [];
             rows.forEach(row => {
               row.teamwinloss ? teams.push({ team: row.teamwinloss, teammember1: row.teammember1, teammember2: row.teammember2 }) : '';
-              dates.push(row.date);
+              row.teamwinloss ? teamNames.push(row.teamwinloss) : '';
             })
-
-            dates = dates.map(date => date.split('/').map(piece => piece.split('').length > 1 ? piece : `0${piece}`).join('/'));
 
             client.query(`SELECT id, name FROM group_members WHERE group_id=1`)
               .then(result => result.rows.forEach(row => memberIDs.push({ name: row.name, id: row.id })))
@@ -89,8 +108,21 @@ async.series(
                   }
                   return team;
                 })
-              });
 
+                rows.forEach(row => {
+                  for (let i = 0; i < teams.length; i++) {
+                    row.winningteam === teams[i].team ? winningTeams.push([teams[i].teammember1, teams[i].teammember2]) : '';
+                    row.losingteam === teams[i].team ? losingTeams.push([teams[i].teammember1, teams[i].teammember2]) : '';
+                  }
+                  teamNames.includes(row.winningteam) ? dates.push(row.date) : '';
+                  teamNames.includes(row.winningteam) ? notes.push(row.notes) : '';
+                })
+                dates = dates.map(date => date.split('/').map(piece => piece.split('').length > 1 ? piece : `0${piece}`).join('/')).map(date => new Date(date).getTime());
+
+                dates.forEach((date, idx) => {
+                  new Game(date, winningTeams[idx], losingTeams[idx], notes[idx], 1).save();
+                })
+              });
           }
         );
         step();
@@ -498,13 +530,6 @@ const renderDashboard = (req, res) => {
   }
 
   lookupGroup(handler);
-}
-
-const addGame = (date, winningTeam, losingTeam, notes, groupID) => {
-  const SQL = 'INSERT INTO games (date, winning_team, losing_team, notes, group_id) VALUES($1,$2,$3,$4,$5)';
-  const values = [date, winningTeam, losingTeam, notes, groupID];
-
-  // client.query(SQL, values);
 }
 
 app.listen(PORT, console.log(`App listening on ${PORT}.`));
