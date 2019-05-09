@@ -1,10 +1,10 @@
-const pg = require('pg');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const cookieParser = require('cookie-parser');
-require('dotenv').config();
-const express = require('express');
-const methodOverride = require('method-override');
+const pg = require("pg");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const cookieParser = require("cookie-parser");
+require("dotenv").config();
+const express = require("express");
+const methodOverride = require("method-override");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,22 +12,22 @@ const DATABASE_URL = process.env.DATABASE_URL;
 const SECURE_KEY = process.env.SECURE_KEY;
 const GoogleSpreadsheet = require("google-spreadsheet");
 const creds = {
-  "type": process.env.TYPE,
-  "project_id": process.env.PROJECT_ID,
-  "private_key_id": process.env.PRIVATE_KEY_ID,
-  "private_key": process.env.PRIVATE_KEY,
-  "client_email": process.env.CLIENT_EMAIL,
-  "client_id": process.env.CLIENT_ID,
-  "auth_uri": process.env.AUTH_URI,
-  "token_uri": process.env.TOKEN_URI,
-  "auth_provider_x509_cert_url": process.env.AUTH_PROVIDER_X509_CERT_URL,
-  "client_x509_cert_url": process.env.CLIENT_X509_CERT_URL
+  type: process.env.TYPE,
+  project_id: process.env.PROJECT_ID,
+  private_key_id: process.env.PRIVATE_KEY_ID,
+  private_key: process.env.PRIVATE_KEY,
+  client_email: process.env.CLIENT_EMAIL,
+  client_id: process.env.CLIENT_ID,
+  auth_uri: process.env.AUTH_URI,
+  token_uri: process.env.TOKEN_URI,
+  auth_provider_x509_cert_url: process.env.AUTH_PROVIDER_X509_CERT_URL,
+  client_x509_cert_url: process.env.CLIENT_X509_CERT_URL
 };
 const async = require("async");
 const STRIPE_SECRET_KEY_TEST = process.env.STRIPE_SECRET_KEY_TEST;
-const stripe = require('stripe')(STRIPE_SECRET_KEY_TEST);
+const stripe = require("stripe")(STRIPE_SECRET_KEY_TEST);
 
-app.set('view engine', 'ejs');
+app.set("view engine", "ejs");
 
 app.use(
   express.urlencoded({
@@ -35,10 +35,10 @@ app.use(
   })
 );
 
-app.use(express.static('./public'));
+app.use(express.static("./public"));
 
 app.use(cookieParser());
-app.use(methodOverride('_method'));
+app.use(methodOverride("_method"));
 const client = new pg.Client(DATABASE_URL);
 client.connect();
 client.on("err", err => console.log(err));
@@ -57,7 +57,7 @@ const doc = new GoogleSpreadsheet(
 //     function getInfoAndWorksheets(step) {
 //       doc.getInfo(function(err, info) {
 //         sheet = info.worksheets[0];
-        
+
 //         sheet.getRows(
 //           {
 //             offset: 1,
@@ -78,7 +78,7 @@ const doc = new GoogleSpreadsheet(
 //             Game.prototype.save = function() {
 //               const SQL = 'INSERT INTO games (date, winning_team, losing_team, notes, group_id) VALUES($1,$2,$3,$4,$5)';
 //               const values = [this.date, this.winningTeam, this.losingTeam, this.notes, this.groupID];
-            
+
 //               // client.query(SQL, values);
 //             }
 
@@ -136,125 +136,131 @@ const doc = new GoogleSpreadsheet(
 //   }
 // );
 
-
-app.get('/', (req, res) => res.render('pages/index'));
-app.get('/login', (req, res) => res.render('pages/login'));
-app.get('/signup', (req, res) => res.render('pages/signup'));
-app.get('/about', (req, res) => res.render('pages/about'));
-app.get('/dashboard', (req, res) => renderDashboard(req, res));
-app.get('/groups', (req, res) => loginGroup(req.query, res));
-app.get('/payment', (req, res) => stripePayment(req, res));
+app.get("/", (req, res) => res.render("pages/index"));
+app.get("/login", (req, res) => res.render("pages/login"));
+app.get("/signup", (req, res) => res.render("pages/signup"));
+app.get("/about", (req, res) => res.render("pages/about"));
+app.get("/dashboard", (req, res) => renderDashboard(req, res));
+app.get("/groups", (req, res) => loginGroup(req.query, res));
+app.get("/payment", (req, res) => stripePayment(req, res));
 app.get(
-  '/logout',
-  (req, res) => res.clearCookie('auth') && res.redirect('/login')
+  "/logout",
+  (req, res) => res.clearCookie("auth") && res.redirect("/login")
 );
 
-app.post('/groups', (req, res) => createGroup(req.body, res));
-app.post('/members', (req, res) => addMember(req, res));
+app.post("/groups", (req, res) => createGroup(req.body, res));
+app.post("/members", (req, res) => addMember(req, res));
 
-app.put('/members', (req, res) => updateMember(req, res));
+app.put("/members", (req, res) => updateMember(req, res));
 
-app.delete('/members', (req, res) => deleteMember(req, res));
+app.delete("/members", (req, res) => deleteMember(req, res));
 
 function stripePayment(req, res) {
   (async () => {
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: [{
-        name: 'EuchreV Subscription',
-        description: 'Lifetime subscription of EuchreV',
-        images: ['https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Euchre.jpg/220px-Euchre.jpg'],
-        amount: 1000,
-        currency: 'usd',
-        quantity: 1
-      }],
-      success_url: 'https://card-game-score-history.herokuapp.com/dashboard',
-      cancel_url: 'https://card-game-score-history.herokuapp.com/'
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          name: "EuchreV Subscription",
+          description: "Lifetime subscription of EuchreV",
+          images: [
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Euchre.jpg/220px-Euchre.jpg"
+          ],
+          amount: 1000,
+          currency: "usd",
+          quantity: 1
+        }
+      ],
+      success_url: "https://card-game-score-history.herokuapp.com/dashboard",
+      cancel_url: "https://card-game-score-history.herokuapp.com/"
     });
-    res.render('pages/payment.ejs', {
+    res.render("pages/payment.ejs", {
       sessionId: session.id
-    });    
+    });
   })();
 }
 
 const lookupGroup = handler => {
-  const SQL = handler.query.groupname ? 'SELECT * FROM groups WHERE name=$1' : 'SELECT * FROM groups WHERE id=$1';
-  const values = [handler.query.groupname ? handler.query.groupname : handler.query];
+  const SQL = handler.query.groupname
+    ? "SELECT * FROM groups WHERE name=$1"
+    : "SELECT * FROM groups WHERE id=$1";
+  const values = [
+    handler.query.groupname ? handler.query.groupname : handler.query
+  ];
   return client
     .query(SQL, values)
     .then(results =>
       !results.rows.length
-      ? handler.cacheMiss(results)
-      : handler.cacheHit(results)
+        ? handler.cacheMiss(results)
+        : handler.cacheHit(results)
     );
 };
 
 const lookupMember = handler => {
-  const SQL = 'SELECT * FROM group_members WHERE name=$1 AND group_id=$2';
+  const SQL = "SELECT * FROM group_members WHERE name=$1 AND group_id=$2";
   const values = [handler.query.name, handler.query.groupID];
   return client
     .query(SQL, values)
     .then(results =>
       !results.rows.length
-      ? handler.cacheMiss(results)
-      : handler.cacheHit(results)
+        ? handler.cacheMiss(results)
+        : handler.cacheHit(results)
     );
 };
 
 const getMembers = groupID => {
-  const SQL = 'SELECT * FROM group_members WHERE group_id=$1';
+  const SQL = "SELECT * FROM group_members WHERE group_id=$1";
   const values = [groupID];
   return client.query(SQL, values);
-}
+};
 
 const getGames = groupID => {
-  const SQL = 'SELECT * FROM games WHERE group_id=$1';
+  const SQL = "SELECT * FROM games WHERE group_id=$1";
   const values = [groupID];
   return client.query(SQL, values);
-}
+};
 
 function Group(info) {
   (this.name = info.groupname),
-  (this.email = info.email),
-  (this.password = info.password),
-  (this.paid = false);
+    (this.email = info.email),
+    (this.password = info.password),
+    (this.paid = false);
 }
 
 function Member(info) {
-  (this.name = info.name),
-  (this.groupID = info.groupID);
+  (this.name = info.name), (this.groupID = info.groupID);
 }
 
-Group.prototype.save = function () {
+Group.prototype.save = function() {
   const SQL =
-    'INSERT INTO groups (name, email, password, paid) VALUES($1,$2,$3,$4) RETURNING id';
+    "INSERT INTO groups (name, email, password, paid) VALUES($1,$2,$3,$4) RETURNING id";
   const values = [this.name, this.email, this.password, this.paid];
   return client.query(SQL, values);
 };
 
-Group.update = function (data) {
-  const SQL = 'UPDATE groups SET paid=$1 WHERE id=$2';
+Group.update = function(data) {
+  const SQL = "UPDATE groups SET paid=$1 WHERE id=$2";
   const values = [data.value, data.id];
   return client.query(SQL, values);
-}
+};
 
-Member.prototype.save = function () {
-  const SQL = 'INSERT INTO group_members (name, group_id) VALUES($1,$2)';
+Member.prototype.save = function() {
+  const SQL = "INSERT INTO group_members (name, group_id) VALUES($1,$2)";
   const values = [this.name, this.groupID];
   return client.query(SQL, values);
-}
+};
 
-Member.update = function (info) {
-  const SQL = 'UPDATE group_members SET name=$1 WHERE name=$2 AND group_id=$3';
+Member.update = function(info) {
+  const SQL = "UPDATE group_members SET name=$1 WHERE name=$2 AND group_id=$3";
   const values = [info.newName, info.currentName, info.groupID];
   return client.query(SQL, values);
-}
+};
 
-Member.delete = function (info) {
-  const SQL = 'DELETE FROM group_members WHERE name=$1 AND group_id=$2';
+Member.delete = function(info) {
+  const SQL = "DELETE FROM group_members WHERE name=$1 AND group_id=$2";
   const values = [info.name, info.groupID];
   return client.query(SQL, values);
-}
+};
 
 const createGroup = (req, res) => {
   const validation = [
@@ -266,7 +272,7 @@ const createGroup = (req, res) => {
   const handler = {
     query: req,
     cacheHit: result => {
-      res.send('Cache hit');
+      res.send("Cache hit");
     },
     cacheMiss: result => {
       const hashedPassword = bcrypt.hashSync(req.password, 8);
@@ -278,14 +284,15 @@ const createGroup = (req, res) => {
       if (validation.every(result => result === true)) {
         const newGroup = new Group(groupInfo);
         newGroup.save().then(result => {
-          const token = jwt.sign({
+          const token = jwt.sign(
+            {
               id: result.rows[0].id
             },
             SECURE_KEY
           );
-          res.clearCookie('auth');
-          res.cookie('auth', token);
-          res.redirect('/payment');
+          res.clearCookie("auth");
+          res.cookie("auth", token);
+          res.redirect("/payment");
         });
       }
     }
@@ -303,20 +310,21 @@ const loginGroup = (req, res) => {
         result.rows[0].password
       );
       if (passwordIsValid) {
-        const token = jwt.sign({
+        const token = jwt.sign(
+          {
             id: result.rows[0].id
           },
           SECURE_KEY
         );
-        res.clearCookie('auth');
-        res.cookie('auth', token);
-        res.redirect('/dashboard');
+        res.clearCookie("auth");
+        res.cookie("auth", token);
+        res.redirect("/dashboard");
       } else {
         handler.cacheMiss();
       }
     },
     cacheMiss: result => {
-      res.send('Cache miss');
+      res.send("Cache miss");
     }
   };
 
@@ -330,15 +338,17 @@ const updateGroup = (req, res) => {
       Group.update({ value: true, id: result.rows[0].id });
     },
     cacheMiss: result => {
-      console.log('Group doesn\'t exist');
+      console.log("Group doesn't exist");
     }
-  }
+  };
 
   lookupGroup(handler);
-}
+};
 
 const addMember = (req, res) => {
-  const groupID = req.body ? jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id) : req.groupID;
+  const groupID = req.body
+    ? jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id)
+    : req.groupID;
   const name = req.body ? req.body.name : req.name;
   const handler = {
     query: {
@@ -346,23 +356,28 @@ const addMember = (req, res) => {
       groupID
     },
     cacheHit: result => {
-      console.log('Member exists');
+      console.log("Member exists");
     },
     cacheMiss: result => {
       const newMember = new Member({
         name,
         groupID
       });
-      newMember.save()
-        .then(result => req.body ? res.redirect('/members') : '');
+      newMember
+        .save()
+        .then(result => (req.body ? res.redirect("/members") : ""));
     }
-  }
+  };
 
   lookupMember(handler);
-}
+};
 
 const updateMember = (req, res) => {
-  const groupID = jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id);
+  const groupID = jwt.verify(
+    req.cookies.auth,
+    SECURE_KEY,
+    (err, decoded) => decoded.id
+  );
   const name = req.body.name;
   const currentName = req.body.currentname;
   const handler = {
@@ -375,20 +390,23 @@ const updateMember = (req, res) => {
         newName: name,
         currentName,
         groupID
-      }
-      Member.update(memberInfo)
-        .then(result => res.redirect('/members'));
+      };
+      Member.update(memberInfo).then(result => res.redirect("/members"));
     },
     cacheMiss: result => {
-      console.log('Member does not exist');
+      console.log("Member does not exist");
     }
-  }
+  };
 
   lookupMember(handler);
-}
+};
 
 const deleteMember = (req, res) => {
-  const groupID = jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id);
+  const groupID = jwt.verify(
+    req.cookies.auth,
+    SECURE_KEY,
+    (err, decoded) => decoded.id
+  );
   const name = req.body.name;
   const handler = {
     query: {
@@ -396,19 +414,22 @@ const deleteMember = (req, res) => {
       name
     },
     cacheHit: result => {
-      Member.delete(handler.query)
-        .then(result => res.redirect('/members'));
+      Member.delete(handler.query).then(result => res.redirect("/members"));
     },
     cacheMiss: result => {
-      console.log('Member does not exist');
+      console.log("Member does not exist");
     }
-  }
+  };
 
   lookupMember(handler);
-}
+};
 
 const renderDashboard = (req, res) => {
-  const groupID = jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id);
+  const groupID = jwt.verify(
+    req.cookies.auth,
+    SECURE_KEY,
+    (err, decoded) => decoded.id
+  );
   const handler = {
     query: groupID,
     cacheHit: results => {
@@ -421,37 +442,37 @@ const renderDashboard = (req, res) => {
 
       // CONSTRUCTOR FOR EACH memberLeaderboard ENTRY
       function MemberStats(info) {
-        this.name = info.name,
-        this.wins = 0,
-        this.losses = 0,
-        this.winPercentage = 0
-        this.addWin = function() {
+        (this.name = info.name),
+          (this.wins = 0),
+          (this.losses = 0),
+          (this.winPercentage = 0);
+        (this.addWin = function() {
           this.wins++;
-        },
-        this.addLoss = function() {
-          this.losses++;
-        },
-        this.calcWinPercentage = function() {
-          this.winPercentage = this.wins / (this.wins + this.losses);
-        };
+        }),
+          (this.addLoss = function() {
+            this.losses++;
+          }),
+          (this.calcWinPercentage = function() {
+            this.winPercentage = this.wins / (this.wins + this.losses);
+          });
       }
 
       // CONSTRUCTOR FOR EACH teamLeaderboard ENTRY
       function TeamStats(info) {
-        this.playerOne = info[0],
-        this.playerTwo = info[1],
-        this.wins = 0,
-        this.losses = 0,
-        this.winPercentage = 0
-        this.addWin = function() {
+        (this.playerOne = info[0]),
+          (this.playerTwo = info[1]),
+          (this.wins = 0),
+          (this.losses = 0),
+          (this.winPercentage = 0);
+        (this.addWin = function() {
           this.wins++;
-        },
-        this.addLoss = function() {
-          this.losses++;
-        },
-        this.calcWinPercentage = function() {
-          this.winPercentage = this.wins / (this.wins + this.losses);
-        };
+        }),
+          (this.addLoss = function() {
+            this.losses++;
+          }),
+          (this.calcWinPercentage = function() {
+            this.winPercentage = this.wins / (this.wins + this.losses);
+          });
       }
 
       // GATHER LIST OF MEMBERS FROM DATABASE
@@ -464,14 +485,23 @@ const renderDashboard = (req, res) => {
         .then(results => {
           games = results.rows;
           // CONVERT EACH members ENTRY INTO AN OBJECT WITH ONLY RELEVANT INFORMATION
-          members = members.map(member => { return { id: member.id, name: member.name } });
+          members = members.map(member => {
+            return { id: member.id, name: member.name };
+          });
           // CONVERT EACH games ENTRY INTO AN OBJECT WITH ONLY RELEVANT INFORMATION
-          games = games.map(game => { return { date: parseInt(game.date), winning_team: game.winning_team, losing_team: game.losing_team, notes: game.notes }});
+          games = games.map(game => {
+            return {
+              date: parseInt(game.date),
+              winning_team: game.winning_team,
+              losing_team: game.losing_team,
+              notes: game.notes
+            };
+          });
           // STANDARDIZE EACH games ENTRY
           games.forEach(game => {
             // SORT winning_team and losing_team ARRAYS FOR FUTURE COMPARISON USE
-            game.winning_team = game.winning_team.sort((a,b) => a - b);
-            game.losing_team = game.losing_team.sort((a,b) => a - b);
+            game.winning_team = game.winning_team.sort((a, b) => a - b);
+            game.losing_team = game.losing_team.sort((a, b) => a - b);
             // PUSH UNIQUE TEAM CONFIGURATIONS TO THE teams ARRAY
             if (!teams.includes(game.winning_team)) {
               teams.push(game.winning_team);
@@ -482,19 +512,23 @@ const renderDashboard = (req, res) => {
           members.forEach(member => {
             // CONVERT THE INTEGERS IN winning_team AND losing_team ARRAYS TO THEIR MEMBER NAME
             games.forEach(game => {
-              game.winning_team = game.winning_team.map(player => player === member.id ? member.name : player);
-              game.losing_team = game.losing_team.map(player => player === member.id ? member.name : player);
+              game.winning_team = game.winning_team.map(player =>
+                player === member.id ? member.name : player
+              );
+              game.losing_team = game.losing_team.map(player =>
+                player === member.id ? member.name : player
+              );
             });
             // INSTANTIATE NEW memberLeaderboard ENTRY
             let newEntry = new MemberStats(member);
             // CALCULATE TOTAL WINS AND TOTAL LOSSES FOR NEW memberLeaderboard ENTRY
             games.forEach(game => {
               game.winning_team.includes(member.name)
-              ? newEntry.addWin()
-              : (game.losing_team.includes(member.name)
+                ? newEntry.addWin()
+                : game.losing_team.includes(member.name)
                 ? newEntry.addLoss()
-                : '');
-            })
+                : "";
+            });
             // CALCULATE winPercentage FOR NEW memberLeaderboard ENTRY
             newEntry.calcWinPercentage();
             memberLeaderboard.push(newEntry);
@@ -502,7 +536,9 @@ const renderDashboard = (req, res) => {
           // CONVERT THE teams IDs TO member NAMES
           members.forEach(member => {
             teams.forEach((team, idx) => {
-              teams[idx] = team.map(player => player === member.id ? member.name : player );
+              teams[idx] = team.map(player =>
+                player === member.id ? member.name : player
+              );
             });
           });
           teams.forEach(team => {
@@ -510,26 +546,28 @@ const renderDashboard = (req, res) => {
             let newEntry = new TeamStats(team);
             // CALCULATE TOTAL WINS AND LOSSES FOR NEW teamLederboard ENTRY
             games.forEach(game => {
-              game.winning_team[0] === team[0] && game.winning_team[1] === team[1]
-              ? newEntry.addWin()
-              : (game.losing_team[0] === team[0] && game.losing_team[1] === team[1]
+              game.winning_team[0] === team[0] &&
+              game.winning_team[1] === team[1]
+                ? newEntry.addWin()
+                : game.losing_team[0] === team[0] &&
+                  game.losing_team[1] === team[1]
                 ? newEntry.addLoss()
-                : '');
-            })
+                : "";
+            });
             // CALCULATE winPercentage FOR NEW teamLeaderboard ENTRY
             newEntry.calcWinPercentage();
             teamLeaderboard.push(newEntry);
           });
           // RENDER THE dashboard PAGE AND PASS THE LEADERBOARDS TO IT
-          res.render('pages/dashboard', { memberLeaderboard, teamLeaderboard });
+          res.render("pages/dashboard", { memberLeaderboard, teamLeaderboard });
         });
     },
     cacheMiss: results => {
-      res.redirect('/login');
+      res.redirect("/login");
     }
-  }
+  };
 
   lookupGroup(handler);
-}
+};
 
 app.listen(PORT, console.log(`App listening on ${PORT}.`));

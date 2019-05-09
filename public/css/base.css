@@ -7,12 +7,32 @@ nav {
   margin: 0;
   padding: 0;
 }
+h1 {
+  font-size: 42px;
+  line-height: 44px;
+  font-weight: 500;
+}
+h2 {
+  font-size: 28px;
+  line-height: 32px;
+  font-weight: 500;
+}
+.uppercase {
+  text-transform: uppercase;
+}
+.black-bg {
+  background-color: #020000;
+  color: #fff;
+}
 .img-fluid {
   max-width: 100%;
   height: auto;
 }
+.diamond-icon {
+  width: 20px;
+}
 body {
-  background-color: #dfe3e8;
+  background-color: #020000;
   width: 100%;
   font-family: "Montserrat", sans-serif;
   margin: 0;
@@ -20,19 +40,41 @@ body {
 }
 nav {
   margin: 0;
-  background-color: #1c2260;
+  background-color: #fff;
   width: 100%;
   color: #fff;
   height: auto;
   padding-left: 20px;
+  display: grid;
+  grid-template-rows: 1fr;
+  line-height: 40px;
+  align-items: center;
+}
+.nav-item {
+  grid-row: 1;
+  align-self: right;
+  line-height: 40px;
+  text-align: right;
+  padding-right: 20px;
 }
 .brand {
-  line-height: 50px;
-  font-size: 24px;
+  max-width: 100px;
+  height: auto;
+  margin: 10px;
+}
+.brand-parent {
+  display: grid;
+  align-items: center;
+  justify-self: left;
+  grid-row: 1;
 }
 a {
   text-decoration: none;
   color: #212b36;
+}
+.half {
+  width: 50%; 
+  float: left; 
 }
 .button-lg {
   width: 100%;
@@ -42,23 +84,45 @@ a {
   outline-style: none;
   font-size: 18px;
 }
-.blue {
-  background-color: #1c2260;
+.red-button {
+  border: 2px solid #fa0404;
+  padding: 5px;
+  color: #020000
+  margin-right: 10px;
+  border-radius: 5px; 
+}
+.lg {
+  width: 200px; 
+}
+.dark {
+  background-color: #020000;
   color: #fff;
 }
-.blue-border {
+.cover {
+  text-align: center;
+  background-color: #fff;
+  padding: 25px;
+  overflow: hidden;
+}
+.dark-border {
   background-color: #fff !important;
-  border: 2px solid #1c2260;
+  border: 2px solid #020000;
 }
 .bio {
   width: 200px;
   margin: 10px;
+  background-color: #fff;
+  text-align: center;
+  padding: 15px;
 }
 .subheading {
   font-size: 13px;
   line-height: 20px;
   font-weight: 700;
   text-transform: uppercase;
+}
+.feature {
+  width: 33%;
 }
 @media only screen and (max-width: 767px) {
   h1 {
@@ -103,7 +167,13 @@ a {
     font-weight: 400;
   }
   .bio {
-    width: 300px;
+    width: 330px;
     margin: 10px;
+    background-color: #fff;
+    text-align: center;
+  }
+  .feature {
+    width: 80%;
+    height: 200px;
   }
 }
