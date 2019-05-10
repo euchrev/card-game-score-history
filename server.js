@@ -144,7 +144,7 @@ app.post('/login', (req, res) => loginGroup(req.body, res));
 app.get('/payment', (req, res) => stripePayment(req, res));
 app.get( '/logout', (req, res) => res.clearCookie('auth') && res.redirect('/login'));
 app.get('/new-game',(req, res) => newGameScore(req, res));
-app.post('/games', (req, res) => addGame(req.body, res));
+app.post('/games', (req, res) => addGame(req, res));
 app.post('/groups', (req, res) => createGroup(req.body, res));
 app.post('/members', (req, res) => addMember(req, res));
 app.put('/members', (req, res) => updateMember(req, res));
@@ -375,26 +375,22 @@ const loginGroup = (req, res) => {
     const handler = {
       query: req,
       cacheHit: result => {
-        getMembers(result.rows[0].id)
-          .then(results => {
-            const members = results.rows;
-            const passwordIsValid = bcrypt.compareSync(
-              req.password,
-              result.rows[0].password
+          const passwordIsValid = bcrypt.compareSync(
+            req.password,
+            result.rows[0].password
+          );
+          if (passwordIsValid) {
+            const token = jwt.sign({
+                id: result.rows[0].id
+              },
+              SECURE_KEY
             );
-            if (passwordIsValid) {
-              const token = jwt.sign({
-                  id: result.rows[0].id
-                },
-                SECURE_KEY
-              );
-              res.clearCookie('auth');
-              res.cookie('auth', token);
-              res.redirect('/dashboard', { members });
-            } else {
-              handler.cacheMiss();
-            }
-          })        
+            res.clearCookie('auth');
+            res.cookie('auth', token);
+            res.redirect('/dashboard');
+          } else {
+            handler.cacheMiss();
+          }       
       },
       cacheMiss: result => {
         res.render('pages/signup');
@@ -651,10 +647,6 @@ const renderDashboard = (req, res) => {
 const addGame = (req, res) => {
   
   function Game(winningTeam, losingTeam, notes, groupID) {
-    typeof winningTeam === 'number'? '' : console.log('Game object type error');
-    typeof losingTeam  === 'number' ? '' : console.log('Game object type error');
-    typeof notes  === 'string' ? '' : console.log('Game object type error');
-    typeof groupID  === 'number' ? '' : console.log('Game object type error');
 
     this.date = Date.now(),
     this.winningTeam = winningTeam,
@@ -673,24 +665,18 @@ const addGame = (req, res) => {
   let winningTeam = [];
   let losingTeam = [];
   const SQL = 'SELECT * FROM group_members WHERE name=$1 OR name=$2 OR name=$3 OR name=$4';
-  const values = [req['winning-player1'], req['winning-player2'], req['losing-player1'], req['losing-player2']];
+  const values = [req.body['winning-player1'], req.body['winning-player2'], req.body['losing-player1'], req.body['losing-player2']];
   client.query(SQL, values)
     .then(results => {
       results.rows.forEach(row => {
-        if (row.name === req['winning-player1'] || row.name === req['winning-player2']) {
+        if (row.name === req.body['winning-player1'] || row.name === req.body['winning-player2']) {
           winningTeam.push(row.id);
         } else {
           losingTeam.push(row.id);
         }
       });
-      new Game(winningTeam, losingTeam, req.notes, groupID).save()
-        .then(() => {
-          getMembers(groupID)
-            .then(results => {
-              const members = results.rows;
-              res.redirect('/dashboard', { members });
-            })
-        });
+      new Game(winningTeam, losingTeam, req.body.notes, groupID).save()
+        .then(() => res.redirect('/dashboard'));
     });
 }
 
