@@ -144,86 +144,116 @@ app.post('/login', (req, res) => loginGroup(req.body, res));
 app.get('/payment', (req, res) => stripePayment(req, res));
 app.get( '/logout', (req, res) => res.clearCookie('auth') && res.redirect('/login'));
 app.get('/new-game',(req, res) => newGameScore(req, res));
-app.post('/games', (req, res) => addGame(req.body, res));
+app.post('/games', (req, res) => addGame(req, res));
 app.post('/groups', (req, res) => createGroup(req.body, res));
 app.post('/members', (req, res) => addMember(req, res));
 app.put('/members', (req, res) => updateMember(req, res));
 app.delete('/members', (req, res) => deleteMember(req, res));
 
 function stripePayment(req, res) {
-  (async () => {
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items: [
-        {
-          name: "EuchreV Subscription",
-          description: "Lifetime subscription of EuchreV",
-          images: [
-            "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Euchre.jpg/220px-Euchre.jpg"
-          ],
+  try {
+    (async () => {
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [{
+          name: 'EuchreV Subscription',
+          description: 'Lifetime subscription of EuchreV',
+          images: ['https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Euchre.jpg/220px-Euchre.jpg'],
           amount: 1000,
-          currency: "usd",
+          currency: 'usd',
           quantity: 1
-        }
-      ],
-      success_url: "https://card-game-score-history.herokuapp.com/dashboard",
-      cancel_url: "https://card-game-score-history.herokuapp.com/"
-    });
-    res.render("pages/payment.ejs", {
-      sessionId: session.id
-    });
-  })();
+        }],
+        success_url: 'https://card-game-score-history.herokuapp.com/dashboard',
+        cancel_url: 'https://card-game-score-history.herokuapp.com/'
+      });
+      res.render('pages/payment.ejs', {
+        sessionId: session.id
+      });
+    })();
+
+  }catch(error){
+    console.log(error);
+  }
 }
 
 const newGameScore = (req, res) => {
-  const SQL = 'SELECT name FROM group_members WHERE group_id=$1';
-  const values = [jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id)]
-  return client.query(SQL, values).then( name => {
-    return {members: name.rows};
+  try{
+    const SQL = 'SELECT name FROM group_members WHERE group_id=$1';
+    const values = [jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id)]
+    return client.query(SQL, values).then( name => {
+      return {members: name.rows};
   })
+  }catch (error) {
+    console.log(error)
+  }
+  
  }
 
 const lookupGroup = handler => {
-  const SQL = handler.query.groupname
-    ? "SELECT * FROM groups WHERE name=$1"
-    : "SELECT * FROM groups WHERE id=$1";
-  const values = [
-    handler.query.groupname ? handler.query.groupname : handler.query
-  ];
-  return client
-    .query(SQL, values)
-    .then(results =>
-      !results.rows.length
-        ? handler.cacheMiss(results)
-        : handler.cacheHit(results)
+  try {
+    const SQL = handler.query.groupname ? 'SELECT * FROM groups WHERE name=$1' : 'SELECT * FROM groups WHERE id=$1';
+    const values = [handler.query.groupname ? handler.query.groupname : handler.query];
+    return client
+      .query(SQL, values)
+      .then(results =>
+        !results.rows.length
+          ? handler.cacheMiss(results)
+          : handler.cacheHit(results)
     );
+
+  }catch(error) {
+    console.log(error);
+  }
+  
 };
 
 const lookupMember = handler => {
-  const SQL = "SELECT * FROM group_members WHERE name=$1 AND group_id=$2";
-  const values = [handler.query.name, handler.query.groupID];
-  return client
-    .query(SQL, values)
-    .then(results =>
+  try {
+
+    const SQL = 'SELECT * FROM group_members WHERE name=$1 AND group_id=$2';
+    const values = [handler.query.name, handler.query.groupID];
+    return client
+      .query(SQL, values)
+      .then(results =>
       !results.rows.length
         ? handler.cacheMiss(results)
         : handler.cacheHit(results)
     );
+
+  } catch(error){
+    console.log(error);
+  }
+  
 };
 
 const getMembers = groupID => {
-  const SQL = "SELECT * FROM group_members WHERE group_id=$1";
-  const values = [groupID];
-  return client.query(SQL, values);
-};
+  try {
+    const SQL = 'SELECT * FROM group_members WHERE group_id=$1';
+    const values = [groupID];
+    return client.query(SQL, values);
+
+  }catch(error){
+    console.log(error)
+  }
+  
+}
 
 const getGames = groupID => {
-  const SQL = "SELECT * FROM games WHERE group_id=$1";
-  const values = [groupID];
-  return client.query(SQL, values);
-};
+  try {
+    const SQL = 'SELECT * FROM games WHERE group_id=$1';
+    const values = [groupID];
+    return client.query(SQL, values);
+  } catch(error) {
+    console.log(error);
+  }
+  
+}
 
 function Group(info) {
+  typeof info.groupname  === 'string'? '' : console.log('Group object type error');
+  typeof info.email  === 'string' ? '' : console.log('Group object type error');
+  typeof info.password  === 'string' ? '': console.log('Group object type error')
+  typeof info.email  === 'string' ? '' : console.log('Group object type error')
   (this.name = info.groupname),
     (this.email = info.email),
     (this.password = info.password),
@@ -231,127 +261,170 @@ function Group(info) {
 }
 
 function Member(info) {
-  (this.name = info.name), (this.groupID = info.groupID);
+  typeof info.password  === 'string' ? '' : console.log('Group object type error')
+  typeof info.groupID  === 'number' ? '' : console.log('Group object type error')
+  (this.name = info.name),
+  (this.groupID = info.groupID);
 }
 
-Group.prototype.save = function() {
-  const SQL =
-    "INSERT INTO groups (name, email, password, paid) VALUES($1,$2,$3,$4) RETURNING id";
-  const values = [this.name, this.email, this.password, this.paid];
-  return client.query(SQL, values);
+Group.prototype.save = function () {
+  try {
+    const SQL =
+    'INSERT INTO groups (name, email, password, paid) VALUES($1,$2,$3,$4) RETURNING id';
+    const values = [this.name, this.email, this.password, this.paid];
+    return client.query(SQL, values);
+  } catch(error) {
+    console.log(error)
+  }
+  
 };
 
-Group.update = function(data) {
-  const SQL = "UPDATE groups SET paid=$1 WHERE id=$2";
-  const values = [data.value, data.id];
-  return client.query(SQL, values);
-};
+Group.update = function (data) {
+  try {
+   const SQL = 'UPDATE groups SET paid=$1 WHERE id=$2';
+   const values = [data.value, data.id];
+   return client.query(SQL, values);
 
-Member.prototype.save = function() {
-  const SQL = "INSERT INTO group_members (name, group_id) VALUES($1,$2)";
-  const values = [this.name, this.groupID];
-  return client.query(SQL, values);
-};
+  }catch(error){
+    console.log(error);
+  }
+  
+}
 
-Member.update = function(info) {
-  const SQL = "UPDATE group_members SET name=$1 WHERE name=$2 AND group_id=$3";
-  const values = [info.newName, info.currentName, info.groupID];
-  return client.query(SQL, values);
-};
+Member.prototype.save = function () {
+  try {
+    const SQL = 'INSERT INTO group_members (name, group_id) VALUES($1,$2)';
+    const values = [this.name, this.groupID];
+    return client.query(SQL, values);
 
-Member.delete = function(info) {
-  const SQL = "DELETE FROM group_members WHERE name=$1 AND group_id=$2";
+  }catch(error) {
+    console.log(error);
+  }
+  
+}
+
+Member.update = function (info) {
+  try {
+    const SQL = 'UPDATE group_members SET name=$1 WHERE name=$2 AND group_id=$3';
+    const values = [info.newName, info.currentName, info.groupID];
+   return client.query(SQL, values);
+
+  } catch(error) {
+    console.log(error);
+  }
+  
+}
+
+Member.delete = function (info) {
+  try {
+    const SQL = 'DELETE FROM group_members WHERE name=$1 AND group_id=$2';
   const values = [info.name, info.groupID];
   return client.query(SQL, values);
-};
+
+  } catch(error) {
+    console.log(error);
+  }
+  
+}
 
 const createGroup = (req, res) => {
-  const validation = [
-    /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|'(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*')@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(
-      req.email
-    ),
-    /(?=.{8,})/.test(req.password)
-  ];
-  const handler = {
-    query: req,
-    cacheHit: result => {
-      res.render('pages/index')
-    },
-    cacheMiss: result => {
-      const hashedPassword = bcrypt.hashSync(req.password, 8);
-      const groupInfo = {
-        groupname: req.groupname,
-        email: req.email,
-        password: hashedPassword
-      };
-      if (validation.every(result => result === true)) {
-        const newGroup = new Group(groupInfo);
-        newGroup.save().then(result => {
-          const token = jwt.sign(
-            {
-              id: result.rows[0].id
-            },
-            SECURE_KEY
-          );
-          res.clearCookie("auth");
-          res.cookie("auth", token);
-          res.redirect("/payment");
-        });
+  try {
+    const validation = [
+      /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|'(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*')@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(
+        req.email
+      ),
+      /(?=.{8,})/.test(req.password)
+    ];
+    const handler = {
+      query: req,
+      cacheHit: result => {
+        res.render('pages/index')
+      },
+      cacheMiss: result => {
+        const hashedPassword = bcrypt.hashSync(req.password, 8);
+        const groupInfo = {
+          groupname: req.groupname,
+          email: req.email,
+          password: hashedPassword
+        };
+        if (validation.every(result => result === true)) {
+          const newGroup = new Group(groupInfo);
+          newGroup.save().then(result => {
+            const token = jwt.sign({
+                id: result.rows[0].id
+              },
+              SECURE_KEY
+            );
+            res.clearCookie('auth');
+            res.cookie('auth', token);
+            res.redirect('/payment');
+          });
+        }
       }
-    }
-  };
+    };
 
   lookupGroup(handler);
+} catch(error) {
+  console.log(error);
+
+}
 };
 
 const loginGroup = (req, res) => {
-  const handler = {
-    query: req,
-    cacheHit: result => {
-      const passwordIsValid = bcrypt.compareSync(
-        req.password,
-        result.rows[0].password
-      );
-      if (passwordIsValid) {
-        const token = jwt.sign(
-          {
-            id: result.rows[0].id
-          },
-          SECURE_KEY
-        );
-        res.clearCookie("auth");
-        res.cookie("auth", token);
-        res.redirect("/dashboard");
-      } else {
-        handler.cacheMiss();
+  try {
+    const handler = {
+      query: req,
+      cacheHit: result => {
+          const passwordIsValid = bcrypt.compareSync(
+            req.password,
+            result.rows[0].password
+          );
+          if (passwordIsValid) {
+            const token = jwt.sign({
+                id: result.rows[0].id
+              },
+              SECURE_KEY
+            );
+            res.clearCookie('auth');
+            res.cookie('auth', token);
+            res.redirect('/dashboard');
+          } else {
+            handler.cacheMiss();
+          }       
+      },
+      cacheMiss: result => {
+        res.render('pages/signup');
       }
-    },
-    cacheMiss: result => {
-      res.render('pages/signup');
-    }
-  };
+    };
+  
+    lookupGroup(handler);
 
-  lookupGroup(handler);
+  }catch (error) {
+    console.log(error);
+  }
+  
 };
 
 const updateGroup = (req, res) => {
-  const handler = {
-    query: req,
-    cacheHit: result => {
-      Group.update({ value: true, id: result.rows[0].id });
-    },
-    cacheMiss: result => {
-      console.log("Group doesn't exist");
+  try {
+    const handler = {
+      query: req,
+      cacheHit: result => {
+        Group.update({ value: true, id: result.rows[0].id });
+      },
+      cacheMiss: result => {
+        console.log('Group doesn\'t exist');
+      }
     }
-  };
-
-  lookupGroup(handler);
+    lookupGroup(handler);
+  }catch (error){
+    console.log(error)
+  }
 };
 
 const addMember = (req, res) => {
-  const groupID = req.body
-    ? jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id)
-    : req.groupID;
+  try {
+    const groupID = req.body ? jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id) : req.groupID;
   const name = req.body ? req.body.name : req.name;
   const handler = {
     query: {
@@ -373,14 +446,15 @@ const addMember = (req, res) => {
   };
 
   lookupMember(handler);
-};
+
+  } catch(error) {
+    console.log(error);
+  }
+}
 
 const updateMember = (req, res) => {
-  const groupID = jwt.verify(
-    req.cookies.auth,
-    SECURE_KEY,
-    (err, decoded) => decoded.id
-  );
+  try {
+    const groupID = jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id);
   const name = req.body.name;
   const currentName = req.body.currentname;
   const handler = {
@@ -402,14 +476,16 @@ const updateMember = (req, res) => {
   };
 
   lookupMember(handler);
-};
+
+  } catch(error) {
+    console.log(error);
+  }
+  
+}
 
 const deleteMember = (req, res) => {
-  const groupID = jwt.verify(
-    req.cookies.auth,
-    SECURE_KEY,
-    (err, decoded) => decoded.id
-  );
+  try {
+    const groupID = jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id);
   const name = req.body.name;
   const handler = {
     query: {
@@ -425,14 +501,17 @@ const deleteMember = (req, res) => {
   };
 
   lookupMember(handler);
-};
+
+  } catch(error) {
+    console.log(error);
+
+  }
+  
+}
 
 const renderDashboard = (req, res) => {
-  const groupID = jwt.verify(
-    req.cookies.auth,
-    SECURE_KEY,
-    (err, decoded) => decoded.id
-  );
+  try {
+    const groupID = jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id);
   const handler = {
     query: groupID,
     cacheHit: results => {
@@ -547,7 +626,7 @@ const renderDashboard = (req, res) => {
             // RENDER THE dashboard PAGE AND PASS THE LEADERBOARDS TO IT
             memberLeaderboard = memberLeaderboard.filter(member => member.wins + member.losses > 10);
             teamLeaderboard = teamLeaderboard.filter(team => team.wins + team.losses > 10);
-            res.render('pages/dashboard', { memberLeaderboard, teamLeaderboard });
+            res.render('pages/dashboard', { memberLeaderboard, teamLeaderboard, members });
           });
       });
     },
@@ -557,21 +636,28 @@ const renderDashboard = (req, res) => {
   };
 
   lookupGroup(handler);
-};
+
+  } catch(error) {
+    console.log(error);
+
+  }
+  
+}
 
 const addGame = (req, res) => {
+  
   function Game(winningTeam, losingTeam, notes, groupID) {
+
     this.date = Date.now(),
     this.winningTeam = winningTeam,
     this.losingTeam = losingTeam,
     this.notes = notes,
     this.groupID = groupID;
   }
-
+ 
   Game.prototype.save = function() {
     const SQL = 'INSERT INTO games (date, winning_team, losing_team, notes, group_id) VALUES($1,$2,$3,$4,$5)';
     const values = [this.date, this.winningTeam, this.losingTeam, this.notes, this.groupID];
-  
     return client.query(SQL, values);
   }
 
@@ -579,17 +665,17 @@ const addGame = (req, res) => {
   let winningTeam = [];
   let losingTeam = [];
   const SQL = 'SELECT * FROM group_members WHERE name=$1 OR name=$2 OR name=$3 OR name=$4';
-  const values = [req['winning-player1'], req['winning-player2'], req['losing-player1'], req['losing-player2']];
+  const values = [req.body['winning-player1'], req.body['winning-player2'], req.body['losing-player1'], req.body['losing-player2']];
   client.query(SQL, values)
     .then(results => {
       results.rows.forEach(row => {
-        if (row.name === req['winning-player1'] || row.name === req['winning-player2']) {
+        if (row.name === req.body['winning-player1'] || row.name === req.body['winning-player2']) {
           winningTeam.push(row.id);
         } else {
           losingTeam.push(row.id);
         }
       });
-      new Game(winningTeam, losingTeam, req.notes, groupID).save()
+      new Game(winningTeam, losingTeam, req.body.notes, groupID).save()
         .then(() => res.redirect('/dashboard'));
     });
 }

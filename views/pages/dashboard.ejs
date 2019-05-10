@@ -29,10 +29,12 @@
 
           <input type="radio" name="dashboard-state" id="settings-radio" />
           <section class="dashboard-wrapper">
-            <%- include('../partials/settings.ejs') %>
+            <%- include('../partials/settings.ejs', { members }) %>
           </section>
         </section>
-        </form>
-      </main>
+      </form>
+    </main>
+    <% include ../partials/footer %>
+    <script src="js/script.js"></script>
   </body>
 </html>

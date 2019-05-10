@@ -87,3 +87,25 @@ tfoot {
 ::-webkit-scrollbar-thumb {
   background-color: #000;
 }
+
+/***********STRIPE*************/
+
+.stripe button,
+footer button {
+  height: 30px;
+  width: 150px;
+  font-size: 1.2em;
+  background-color: transparent;
+  border: 2px solid #222;
+  color: #222;
+  transition: all .3s ease;
+  box-sizing: border-box;
+}
+
+/***********FOOTER*************/
+
+footer button {
+  grid-row: 1;
+  text-align: center;
+  cursor: pointer;
+}

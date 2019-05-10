@@ -2,13 +2,15 @@
 
 **Authors:** Rory Letteney, Austin Jess, Floyd Orr, Michele Saba
 
-**Version:** 0.27.1
+**Version:** 0.36.2
 
 ## Overview
 
 ## Architecture
 
 ## Change log
+- 05-10-2019 *9:39am* - Settings page now has a form implemented for adding a new game to the database.
+- 05-09-2019 *5:55pm* - Footer buttons now send user to the settings page for adding a new member or game data.
 - 05-09-2019 *4:00pm* - Rory-specific information now in the team's "about us" page.
 - 05-09-2019 *2:44pm* - Users can now enter new games into the database from the front-end. Login information now being sent via POST instead of GET. Group leaderboards entries now must meet threshold of 10 games in order to be rendered on the page.
 - 05-09-2019 *1:54* - Both team and members leaderboards are now sorted by highest win percentage.
