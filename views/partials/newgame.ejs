@@ -7,14 +7,14 @@
           <option value="<%= member.name %>"><%= member.name %></option>
           <% }); %>
          </select>
-        
+
          <select name="winning-player2" class='green-border center-row'>
            <% members.forEach(function(member){ %>
             <option value="<%= member.name %>"><%= member.name %></option>
             <% }); %>
         </select>
 
-        <h2 class="red">losing Team</h2>
+        <h2 class="red">Losing Team</h2>
         <select name="losing-player1" class='red-border center-row'>
           <% members.forEach(function(member){ %>
             <option value="<%= member.name %>"><%= member.name %></option>
@@ -30,4 +30,4 @@
       <textarea name="notes" rows="9" cols="65" placeholder='Notes'></textarea >
       <input type="submit" class="button-lg blue-border text-center" value="Submit">
     </form>
- 
+
