@@ -103,8 +103,8 @@ a {
 }
 .half {
   width: 50%;
-  float: left;
-  padding: 10px;
+  /* float: left; */
+  /* padding: 10px; */
 }
 .cover-image-container {
   width: 33%;
@@ -167,7 +167,7 @@ li {
 
 table {
   border-collapse: collapse;
-  width: 90%;
+  /* width: 90%; */
 }
 
 .bio {
@@ -263,6 +263,8 @@ table {
     padding: 10px;
     box-sizing: border-box;
   }
+
+  /* WHY IS THIS HERE? */
   .settings-buttons {
     width: 100px;
   }
