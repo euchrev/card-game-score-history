@@ -266,12 +266,7 @@ function Group(info) {
 }
 
 function Member(info) {
-  typeof info.password === "string"
-    ? ""
-    : console.log("Group object type error");
-  typeof info.groupID === "number"
-    ? ""
-    : console.log("Group object type error")((this.name = info.name)),
+  (this.name = info.name),
     (this.groupID = info.groupID);
 }
 
@@ -427,6 +422,7 @@ const addMember = (req, res) => {
       ? jwt.verify(req.cookies.auth, SECURE_KEY, (err, decoded) => decoded.id)
       : req.groupID;
     const name = req.body ? req.body.name : req.name;
+    console.log(name);
     const handler = {
       query: {
         name,
@@ -442,7 +438,7 @@ const addMember = (req, res) => {
         });
         newMember
           .save()
-          .then(result => (req.body ? res.redirect("/members") : ""));
+          .then(result => (req.body ? renderDashboard(req, res) : ""));
       }
     };
 
@@ -519,6 +515,7 @@ const renderDashboard = (req, res) => {
       SECURE_KEY,
       (err, decoded) => decoded.id
     );
+    console.log(groupID);
     const handler = {
       query: groupID,
       cacheHit: results => {
