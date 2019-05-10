@@ -119,6 +119,11 @@ a {
   text-decoration: none;
   color: #212b36;
 }
+.half {
+  width: 50%;
+  /* float: left; */
+  /* padding: 10px; */
+}
 .cover-image-container {
   width: 100%;
 }
@@ -177,7 +182,7 @@ li {
 
 table {
   border-collapse: collapse;
-  width: 90%;
+  /* width: 90%; */
 }
 
 .bio {
@@ -279,6 +284,8 @@ table {
     width: 100%;
     box-sizing: border-box;
   }
+
+  /* WHY IS THIS HERE? */
   .settings-buttons {
     width: 100px;
   }

@@ -1,15 +1,13 @@
-form {
+.dashboard-form {
   width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
-  justify-content: center;
   background-color: #fff;
+
 }
 input {
   line-height: 35px;
   outline-style: none;
-  width: 100%;
+  /* width: 100%; */
+  width: 80%;
   margin: 5px;
   text-align: left;
   padding: 5px;
@@ -57,3 +55,8 @@ footer {
   background-color: #fff;
   border-top: 2px solid #222;
 }
+
+.right {
+  float: right;
+}
+
