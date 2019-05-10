@@ -539,7 +539,7 @@ const renderDashboard = (req, res) => {
               this.losses++;
             }),
             (this.calcWinPercentage = function() {
-              this.winPercentage = this.wins / (this.wins + this.losses);
+              this.wins <= 0 ? '' : this.winPercentage = this.wins / (this.wins + this.losses);
             });
         }
 
@@ -557,7 +557,7 @@ const renderDashboard = (req, res) => {
               this.losses++;
             }),
             (this.calcWinPercentage = function() {
-              this.winPercentage = this.wins / (this.wins + this.losses);
+              this.wins <= 0 ? '' : this.winPercentage = this.wins / (this.wins + this.losses);
             });
         }
 
