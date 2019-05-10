@@ -222,6 +222,13 @@ table {
   width: 200px;
 }
 
+.sign-up {
+  width: 80%;
+  margin: auto;
+  box-sizing: border-box;
+  background-color: #fff;
+}
+
 @media only screen and (max-width: 767px) {
   h1 {
     font-size: 27px;
@@ -300,10 +307,5 @@ table {
     background-color: #020000;
     padding: 20px;
   }
-  .sign-up {
-    width: 80%;
-    margin: auto;
-    box-sizing: border-box;
-    background-color: #fff;
-  }
+
 }
