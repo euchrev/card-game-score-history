@@ -64,3 +64,16 @@ footer {
   margin-bottom: 40px;
 }
 
+.form-control {
+  width: 50%;
+  margin: auto;
+}
+
+.form-control select {
+  height: 50px;
+  font-size: 2em;
+}
+
+.sign-up {
+  margin: auto;
+}
