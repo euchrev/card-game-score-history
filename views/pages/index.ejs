@@ -7,13 +7,21 @@
     
     <section class="cover">
       <div class ="cover-image-container">
-          <img src="./img/euchrev.png" class="img-fluid" />
+          <img src="./img/euchrev.png" class="img-fluid logo-image" />
       </div>
-      <div class ="cover-image-container2 ">
-              <h2 class="uppercase text-center">
-                  A score keeping app for your group's euchre games.
-                </h2>
-    </div>
+  </section>
+  <section class ="sign-in-up">
+          <section class="sign-up">
+              <form id="login" class="flex-container" action="/login" method="POST">
+                <h2>Sign In</h2>
+                <input name="groupname" type="text" placeholder="Group Name" />
+                <input name="password" type="password" placeholder="Password" />
+                <button type="submit" class="button-lg dark">
+                  Login <img src="./img/log-in.png" class="icon">
+                </button>
+                <a href="/signup" class="button-lg dark-border text-center">Sign Up</a>
+              </form>
+            </section>
   </section>
       <section class="cover"> 
         <hr />
@@ -28,16 +36,16 @@
     
     
     </section>
-    <section class="flex-container sign-up">
-      <form class="flex-container" action="/login" method="POST">
+    <!-- <section class="flex-container sign-up">
+      <form id="login" class="flex-container" action="/login" method="POST">
         <h2>Have fun!</h2>
         <input name="groupname" type="text" placeholder="Group Name" />
         <input name="password" type="password" placeholder="Password" />
         <button type="submit" class="button-lg dark">
-          Sign In
+          Login
         </button>
         <a href="/signup" class="button-lg dark-border text-center">Sign Up</a>
       </form>
-    </section>
+    </section> -->
   </body>
 </html>

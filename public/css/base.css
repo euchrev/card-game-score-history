@@ -1,3 +1,6 @@
+html {
+  scroll-behavior: smooth;
+}
 body,
 p,
 h1,
@@ -7,12 +10,17 @@ nav {
   margin: 0;
   padding: 0;
 }
-
-html, body {
+html,
+body {
   max-width: 100%;
   overflow-x: hidden;
 }
-
+.icon {
+  width: 25px;
+  position: relative;
+  top: 5px;
+  left: 5px;
+}
 main {
   min-height: calc(100vh - 60.5px);
 }
@@ -29,7 +37,7 @@ body {
   margin: 0;
   padding: 0;
 }
-li {
+.no-list-style {
   list-style: none;
 }
 .white {
@@ -41,28 +49,41 @@ h1 {
   font-weight: 500;
 }
 h2 {
-  font-size: 28px;
+  font-size: 30px;
   line-height: 32px;
-  font-weight: 500;
+  font-weight: 400;
 }
 .uppercase {
   text-transform: uppercase;
 }
-
 .img-fluid {
   max-width: 100%;
   height: auto;
 }
+.logo-image {
+  max-width: 600px;
+}
 .diamond-icon {
   width: 20px;
 }
-.cover-image-container2 {
+.sign-in-up {
   background-color: #020000;
-  color: #fff;
-  float: left;
-  padding: 10px;
+  padding: 45px;
 }
-
+.sign-up {
+  width: 50%;
+  margin: auto;
+  box-sizing: border-box;
+}
+.cover-image-container2 {
+  /* background-color: #fff; */
+  color: #020000;
+  float: left;
+  width: 100%;
+  padding: 10px;
+  text-align: left;
+  box-sizing: border-box;
+}
 nav {
   margin: 0;
   background-color: #fff;
@@ -98,14 +119,8 @@ a {
   text-decoration: none;
   color: #212b36;
 }
-.half {
-  width: 50%;
-  float: left;
-  padding: 10px;
-}
 .cover-image-container {
-  width: 33%;
-  float: left;
+  width: 100%;
 }
 .button-lg {
   width: 100%;
@@ -122,14 +137,12 @@ a {
 .dark-border {
   border: 2px solid #020000;
 }
-.sign-up {
-  background-color: grey;
-}
 .lg {
   width: 200px;
 }
 .dark {
   background-color: #020000;
+  border: none;
   color: #fff;
 }
 .cover {
@@ -190,6 +203,20 @@ table {
   border: 2px solid rgb(223, 138, 138);
   margin-bottom: 5px;
 }
+.stripe {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  grid-row-gap: 30px;
+  min-height: 100vh;
+}
+.settings-buttons {
+  width: 200px;
+}
+.settings-inputs {
+  width: 200px;
+}
+
 @media only screen and (max-width: 767px) {
   h1 {
     font-size: 27px;
@@ -200,6 +227,7 @@ table {
     font-size: 24px;
     line-height: 28px;
     font-weight: 500;
+    text-align: center;
   }
   h3 {
     font-size: 21px;
@@ -253,5 +281,21 @@ table {
   }
   .settings-buttons {
     width: 100px;
+  }
+  .cover-image-container2 {
+    width: 100%;
+  }
+  .logo-image {
+    max-width: 100%;
+    margin: auto;
+  }
+  .sign-in-up {
+    background-color: #020000;
+    padding: 20px;
+  }
+  .sign-up {
+    width: 80%;
+    margin: auto;
+    box-sizing: border-box;
   }
 }

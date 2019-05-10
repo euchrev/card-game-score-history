@@ -3,7 +3,7 @@ form {
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
-  /* justify-content: center; */
+  justify-content: center;
   background-color: #fff;
 }
 input {
@@ -42,4 +42,18 @@ textarea {
 }
 .left {
   float: left;
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  display: grid;
+  justify-content: center;
+  grid-template-rows: 1fr;
+  height: 30px;
+  grid-column-gap: 30px;
+  padding: 10px 0;
+  background-color: #fff;
+  border-top: 2px solid #222;
 }
