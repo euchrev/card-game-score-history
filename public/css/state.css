@@ -29,8 +29,9 @@
   }
 
   .dashboard-form label:hover {
-    background-color: #fff;
-    color: #000;
+    text-decoration: underline;
+    background: none;
+    border: none;
   }
 }
 
