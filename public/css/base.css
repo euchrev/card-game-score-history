@@ -223,7 +223,7 @@ table {
 }
 
 .sign-up {
-  width: 80%;
+  width: 50%;
   margin: auto;
   box-sizing: border-box;
   background-color: #fff;
@@ -308,4 +308,7 @@ table {
     padding: 20px;
   }
 
+  .sign-up {
+    width: 80%;
+  }
 }
