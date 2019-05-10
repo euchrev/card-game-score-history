@@ -1,9 +1,9 @@
 <div class="flex-container">
-  <%- include('./addMember.ejs') %>
+<!-- <p class="name">Add Game</p> -->
+<%- include('./newgame.ejs', { members }) %>
 </div>
-  <div class="flex-container">
-  <p class="name">Add Game</p>
-  <%- include('./newgame.ejs', { members }) %>
+<div class="flex-container member-bottom">
+  <%- include('./addMember.ejs') %>
 </div>
 
 <!-- SET MINIMUM GAME THRESHOLD -->
