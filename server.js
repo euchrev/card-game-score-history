@@ -375,22 +375,26 @@ const loginGroup = (req, res) => {
     const handler = {
       query: req,
       cacheHit: result => {
-        const passwordIsValid = bcrypt.compareSync(
-          req.password,
-          result.rows[0].password
-        );
-        if (passwordIsValid) {
-          const token = jwt.sign({
-              id: result.rows[0].id
-            },
-            SECURE_KEY
-          );
-          res.clearCookie('auth');
-          res.cookie('auth', token);
-          res.redirect('/dashboard');
-        } else {
-          handler.cacheMiss();
-        }
+        getMembers(result.rows[0].id)
+          .then(results => {
+            const members = results.rows;
+            const passwordIsValid = bcrypt.compareSync(
+              req.password,
+              result.rows[0].password
+            );
+            if (passwordIsValid) {
+              const token = jwt.sign({
+                  id: result.rows[0].id
+                },
+                SECURE_KEY
+              );
+              res.clearCookie('auth');
+              res.cookie('auth', token);
+              res.redirect('/dashboard', { members });
+            } else {
+              handler.cacheMiss();
+            }
+          })        
       },
       cacheMiss: result => {
         res.render('pages/signup');
@@ -626,7 +630,7 @@ const renderDashboard = (req, res) => {
             // RENDER THE dashboard PAGE AND PASS THE LEADERBOARDS TO IT
             memberLeaderboard = memberLeaderboard.filter(member => member.wins + member.losses > 10);
             teamLeaderboard = teamLeaderboard.filter(team => team.wins + team.losses > 10);
-            res.render('pages/dashboard', { memberLeaderboard, teamLeaderboard });
+            res.render('pages/dashboard', { memberLeaderboard, teamLeaderboard, members });
           });
       });
     },
@@ -680,7 +684,13 @@ const addGame = (req, res) => {
         }
       });
       new Game(winningTeam, losingTeam, req.notes, groupID).save()
-        .then(() => res.redirect('/dashboard'));
+        .then(() => {
+          getMembers(groupID)
+            .then(results => {
+              const members = results.rows;
+              res.redirect('/dashboard', { members });
+            })
+        });
     });
 }
 
