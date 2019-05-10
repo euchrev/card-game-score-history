@@ -55,7 +55,7 @@
   top: 35%;
   width: 80%;
   left: 8%;
-  padding-top: 60px;
+  /* padding-top: 60px; */
 }
 
 .dashboard-form input[type="radio"]:checked + .dashboard-wrapper {

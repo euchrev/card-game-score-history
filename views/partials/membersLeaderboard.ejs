@@ -2,10 +2,10 @@
 <table class="dashboard-table" id="members-leaderboard">
   <thead>
     <tr>
-      <th class="table-name">NAME</th>
-      <th>WIN TOTAL</th>
-      <th>LOSS TOTAL</th>
-      <th>WIN PERCENTAGE</th>
+      <th>NAME</th>
+      <th class="align-right">WIN TOTAL</th>
+      <th class="align-right">LOSS TOTAL</th>
+      <th class="align-right">WIN PERCENTAGE</th>
     </tr>
   </thead>
   <% memberLeaderboard.sort((a, b) => b.winPercentage - a.winPercentage) %> <%
@@ -17,9 +17,4 @@
     <td><%= Math.floor(member.winPercentage * 100) %> %</td>
   </tr>
   <% }) %>
-  <tfoot>
-    <tr>
-      <th><a href="pages/settings.ejs">ADD NEW MEMBER</a></th>
-    </tr>
-  </tfoot>
 </table>
