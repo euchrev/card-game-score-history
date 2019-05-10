@@ -74,6 +74,7 @@ h2 {
   width: 50%;
   margin: auto;
   box-sizing: border-box;
+  background-color: #fff;
 }
 .cover-image-container2 {
   /* background-color: #fff; */
@@ -301,9 +302,9 @@ table {
     padding: 20px;
   }
   .sign-up {
+    background-color: #fff;
     width: 80%;
     margin: auto;
     box-sizing: border-box;
-    background-color: #fff;
   }
 }
