@@ -112,3 +112,11 @@ footer button {
   text-align: center;
   cursor: pointer;
 }
+
+.center {
+  margin: 0 auto;
+  text-align: center;
+  margin-bottom: 80px;
+}
+
+
